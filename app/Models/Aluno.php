@@ -5,19 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Endereco extends Model
+class Aluno extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['pessoa_id', 'rua', 'bairro', 'numero', 'cidade_id'];
+    protected $fillable = ['pessoa_id', 'id'];
 
-    public function pessoa() 
+    public function pessoa()
     {
         return $this->belongsTo('App\Models\Pessoa');
     }
 
-    public function cidade() 
+    public function salasVirtuais()
     {
-        return $this->belongsTo('App\Models\Cidade');
+        return $this->belongsToMany('App\Models\SalaVirtual', 'sala_virtual_alunos');
     }
+
 }
