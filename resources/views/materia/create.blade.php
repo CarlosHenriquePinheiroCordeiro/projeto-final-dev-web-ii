@@ -3,7 +3,7 @@
 @section('titulo', 'Incluir Matéria')
 
 @section('conteudo')
-    <form action="{{ route('materia.store')}}" method="post">
+    <form action="{{route('materia.store')}}" method="post">
         @method("POST")
         @include('materia.form')
     </form>

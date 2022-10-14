@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('nome', 100);
             $table->date('data_nascimento');
-            $table->char('cpf', 11);
-            $table->char('rg', 12);
+            $table->char('cpf', 11)->nullable();
+            $table->char('rg', 12)->nullable();
             $table->timestamps();
             $table->unsignedBigInteger('usuario_id');
             $table->foreign('usuario_id')->references('id')->on('usuarios');

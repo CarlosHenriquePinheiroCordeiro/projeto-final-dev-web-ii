@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Materia;
 use App\Models\SalaVirtual;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,15 @@ class SalaVirtualController extends Controller
      */
     public function index()
     {
-        //
+        $dados = array();
+        if (request('find') != null)
+        {
+            $busca = request('find');
+            $dados = SalaVirtual::where('nome', 'like', "$busca%")->get();
+        }
+        else
+            $dados = SalaVirtual::all();
+        return view('salaVirtual.index', compact('dados'));
     }
 
     /**
@@ -24,7 +33,8 @@ class SalaVirtualController extends Controller
      */
     public function create()
     {
-        //
+        $dados = ['insert' => true, 'materias' => Materia::all()];
+        return view('salaVirtual.create', compact('dados'));
     }
 
     /**
@@ -35,7 +45,13 @@ class SalaVirtualController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $SalaVirtual = new SalaVirtual();
+        $SalaVirtual->id         = $request->id;
+        $SalaVirtual->nome       = $request->nome;
+        $SalaVirtual->descricao  = $request->descricao;
+        $SalaVirtual->materia_id = $request->materia_id;
+        $SalaVirtual->save();
+        return redirect()->route('salaVirtual.index');
     }
 
     /**
@@ -46,7 +62,8 @@ class SalaVirtualController extends Controller
      */
     public function show(SalaVirtual $salaVirtual)
     {
-        //
+        $dados = ['salaVirtual' => $salaVirtual, 'visualizar' => true, 'materias' => Materia::all()];
+        return view('salaVirtual.show', compact('dados'));
     }
 
     /**
@@ -57,7 +74,8 @@ class SalaVirtualController extends Controller
      */
     public function edit(SalaVirtual $salaVirtual)
     {
-        //
+        $dados = ['salaVirtual' => $salaVirtual, 'insert' => true, 'materias' => Materia::all()];
+        return view('salaVirtual.edit', compact('dados'));
     }
 
     /**
@@ -69,7 +87,12 @@ class SalaVirtualController extends Controller
      */
     public function update(Request $request, SalaVirtual $salaVirtual)
     {
-        //
+        $salaVirtual->id         = $request->id;
+        $salaVirtual->nome       = $request->nome;
+        $salaVirtual->descricao  = $request->descricao;
+        $salaVirtual->materia_id = $request->materia_id;
+        $salaVirtual->update();
+        return redirect()->route('salaVirtual.index');
     }
 
     /**
@@ -80,6 +103,7 @@ class SalaVirtualController extends Controller
      */
     public function destroy(SalaVirtual $salaVirtual)
     {
-        //
+        SalaVirtual::destroy($salaVirtual->id);
+        return redirect()->route('salaVirtual.index');
     }
 }

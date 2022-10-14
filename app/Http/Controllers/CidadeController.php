@@ -101,7 +101,7 @@ class CidadeController extends Controller
      */
     public function destroy(Cidade $cidade)
     {
-        Estado::destroy($cidade->id);
+        Cidade::destroy($cidade->id);
         return redirect()->route('cidade.index');
     }
 }
