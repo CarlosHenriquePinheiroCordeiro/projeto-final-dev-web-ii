@@ -14,7 +14,15 @@ class MateriaController extends Controller
      */
     public function index()
     {
-        //
+        $dados = array();
+        if (request('find') != null)
+        {
+            $busca = request('find');
+            $dados = Materia::where('nome', 'like', "$busca%")->get();
+        }
+        else
+            $dados = Materia::all();
+        return view('materia.index', compact('dados'));
     }
 
     /**
@@ -24,7 +32,8 @@ class MateriaController extends Controller
      */
     public function create()
     {
-        //
+        $dados = ['insert' => true];
+        return view('materia.create', compact('dados'));
     }
 
     /**
@@ -35,7 +44,12 @@ class MateriaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $Materia = new Materia();
+        $Materia->id     = $request->id;
+        $Materia->nome   = $request->nome;
+        $Materia->descricao  = $request->descricao;
+        $Materia->save();
+        return redirect()->route('materia.index');
     }
 
     /**
@@ -46,7 +60,8 @@ class MateriaController extends Controller
      */
     public function show(Materia $materia)
     {
-        //
+        $dados = ['materia' => $materia, 'visualizar' => true];
+        return view('materia.show', compact('dados'));
     }
 
     /**
@@ -57,7 +72,8 @@ class MateriaController extends Controller
      */
     public function edit(Materia $materia)
     {
-        //
+        $dados = ['materia' => $materia, 'insert' => true];
+        return view('materia.edit', compact('dados'));
     }
 
     /**
@@ -69,7 +85,11 @@ class MateriaController extends Controller
      */
     public function update(Request $request, Materia $materia)
     {
-        //
+        $materia->id     = $request->id;
+        $materia->nome   = $request->nome;
+        $materia->descricao  = $request->descricao;
+        $materia->update();
+        return redirect()->route('materia.index');
     }
 
     /**
@@ -80,6 +100,7 @@ class MateriaController extends Controller
      */
     public function destroy(Materia $materia)
     {
-        //
+        Materia::destroy($materia->id);
+        return redirect()->route('materia.index');
     }
 }

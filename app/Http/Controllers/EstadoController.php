@@ -14,7 +14,15 @@ class EstadoController extends Controller
      */
     public function index()
     {
-        //
+        $dados = array();
+        if (request('find') != null)
+        {
+            $busca = request('find');
+            $dados = Estado::where('nome', 'like', "$busca%")->get();
+        }
+        else
+            $dados = Estado::all();
+        return view('estado.index', compact('dados'));
     }
 
     /**
@@ -24,7 +32,8 @@ class EstadoController extends Controller
      */
     public function create()
     {
-        //
+        $dados = ['insert' => true];
+        return view('estado.create', compact('dados'));
     }
 
     /**
@@ -35,7 +44,12 @@ class EstadoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $Estado = new Estado();
+        $Estado->id     = $request->id;
+        $Estado->nome   = $request->nome;
+        $Estado->sigla  = $request->sigla;
+        $Estado->save();
+        return redirect()->route('estado.index');
     }
 
     /**
@@ -46,7 +60,8 @@ class EstadoController extends Controller
      */
     public function show(Estado $estado)
     {
-        //
+        $dados = ['estado' => $estado, 'visualizar' => true];
+        return view('estado.show', compact('dados'));
     }
 
     /**
@@ -57,7 +72,8 @@ class EstadoController extends Controller
      */
     public function edit(Estado $estado)
     {
-        //
+        $dados = ['estado' => $estado, 'insert' => true];
+        return view('estado.edit', compact('dados'));
     }
 
     /**
@@ -69,7 +85,11 @@ class EstadoController extends Controller
      */
     public function update(Request $request, Estado $estado)
     {
-        //
+        $estado->id     = $request->id;
+        $estado->nome   = $request->nome;
+        $estado->sigla  = $request->sigla;
+        $estado->update();
+        return redirect()->route('estado.index');
     }
 
     /**
@@ -80,6 +100,7 @@ class EstadoController extends Controller
      */
     public function destroy(Estado $estado)
     {
-        //
+        Estado::destroy($estado->id);
+        return redirect()->route('estado.index');
     }
 }
