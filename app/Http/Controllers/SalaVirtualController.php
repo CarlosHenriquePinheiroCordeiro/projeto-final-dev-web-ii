@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Aluno;
 use App\Models\Disciplina;
+use App\Models\Pessoa;
+use App\Models\Professor;
 use App\Models\SalaVirtual;
+use App\Models\SalaVirtualAluno;
+use App\Models\SalaVirtualProfessor;
 use Illuminate\Http\Request;
 
 class SalaVirtualController extends Controller
@@ -33,8 +38,35 @@ class SalaVirtualController extends Controller
      */
     public function create()
     {
-        $dados = ['insert' => true, 'disciplinas' => Disciplina::all()];
+        $dados = [
+            'insert'      => true,
+            'disciplinas' => Disciplina::all(),
+            'professores' => $this->getProfessores(),
+            'alunos'      => $this->getAlunos()
+        ];
         return view('salaVirtual.create', compact('dados'));
+    }
+
+    /**
+     * Retorna os professores para a lista de NxN para a sala virtual
+     */
+    protected function getProfessores() {
+        $professores = [];
+        foreach (Professor::all() as $professor) {
+            $professores[$professor->pessoa_id] = Pessoa::where('id', '=', $professor->pessoa_id)->get()[0]->nome;
+        }
+        return $professores;
+    }
+
+     /**
+     * Retorna os professores para a lista de NxN para a sala virtual
+     */
+    protected function getAlunos() {
+        $alunos = [];
+        foreach (Aluno::all() as $aluno) {
+            $alunos[$aluno->pessoa_id] = Pessoa::where('id', '=', $aluno->pessoa_id)->get()[0]->nome;
+        }
+        return $alunos;
     }
 
     /**
@@ -51,6 +83,20 @@ class SalaVirtualController extends Controller
         $SalaVirtual->descricao     = $request->descricao;
         $SalaVirtual->disciplina_id = $request->disciplina_id;
         $SalaVirtual->save();
+
+        foreach ($request->professor_id as $pessoa_id) {
+            $SalaVirtualProfessor = new SalaVirtualProfessor();
+            $SalaVirtualProfessor->pessoa_id = $pessoa_id;
+            $SalaVirtualProfessor->sala_virtual_id = $SalaVirtual->id;
+            $SalaVirtualProfessor->save();
+        }
+
+        foreach ($request->aluno_id as $pessoa_id) {
+            $SalaVirtualAluno = new SalaVirtualAluno();
+            $SalaVirtualAluno->pessoa_id = $pessoa_id;
+            $SalaVirtualAluno->sala_virtual_id = $SalaVirtual->id;
+            $SalaVirtualAluno->save();
+        }
         return redirect()->route('salaVirtual.index');
     }
 
@@ -65,9 +111,35 @@ class SalaVirtualController extends Controller
         $dados = [
             'salaVirtual' => $salaVirtual,
             'visualizar' => true, 
-            'disciplinas' => Disciplina::all()
+            'disciplinas' => Disciplina::all(),
+            'professores' => $this->getProfessores(),
+            'alunos'      => $this->getAlunos(),
+            'professoresSala' => $this->getProfessoresSala($salaVirtual->id),
+            'alunosSala' => $this->getAlunosSala($salaVirtual->id)
         ];
         return view('salaVirtual.show', compact('dados'));
+    }
+
+    /**
+     * Retora os professores da sala virtual
+     */
+    protected function getProfessoresSala($salaVirtual) {
+        $professores = [];
+        foreach (SalaVirtualProfessor::where('sala_virtual_id', '=', $salaVirtual)->get() as $salaProfessor) {
+            $professores[] = $salaProfessor->pessoa_id;
+        }
+        return $professores;
+    }
+
+    /**
+     * Retorna os alunos da sala virtual
+     */
+    protected function getAlunosSala($salaVirtual) {
+        $alunos = [];
+        foreach (SalaVirtualAluno::where('sala_virtual_id', '=', $salaVirtual)->get() as $salaAluno) {
+            $alunos[] = $salaAluno->pessoa_id;
+        }
+        return $alunos;
     }
 
     /**
@@ -81,7 +153,11 @@ class SalaVirtualController extends Controller
         $dados = [
             'salaVirtual' => $salaVirtual,
             'insert' => true,
-            'disciplinas' => Disciplina::all()
+            'disciplinas' => Disciplina::all(),
+            'professores' => $this->getProfessores(),
+            'alunos'      => $this->getAlunos(),
+            'professoresSala' => $this->getProfessoresSala($salaVirtual->id),
+            'alunosSala' => $this->getAlunosSala($salaVirtual->id)
         ];
         return view('salaVirtual.edit', compact('dados'));
     }

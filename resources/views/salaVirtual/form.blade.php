@@ -17,6 +17,19 @@
     @endforeach
 </select>
 <br>
+<hr>
+<h2>Professores da Sala Virtual</h2>
+@foreach ($dados['professores'] as $professor_pessoa_id => $professor_pessoa_nome)
+    {{$professor_pessoa_nome}} <input type="checkbox" name="professor_id[]" id="professor_id[]" @if (isset($dados['visualizar'])) {{'disabled'}} @endif  @if (in_array($professor_pessoa_id, $dados['professoresSala'])) {{'checked'}} @endif value={{$professor_pessoa_id}}>
+    <br>
+@endforeach
+<hr>
+<h2>Alunos da Sala Virtual</h2>
+@foreach ($dados['alunos'] as $aluno_pessoa_id => $aluno_pessoa_nome)
+    {{$aluno_pessoa_nome}} <input type="checkbox" name="aluno_id[]" id="aluno_id[]" @if (isset($dados['visualizar'])) {{'disabled'}} @endif @if (in_array($aluno_pessoa_id, $dados['alunosSala'])) {{'checked'}} @endif value={{$aluno_pessoa_id}}>
+    <br>
+@endforeach
+<hr>
 @if(!isset($dados['visualizar']))
     <button type="submit">Enviar</button>
 @endif
