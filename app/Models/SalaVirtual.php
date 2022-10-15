@@ -7,13 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class SalaVirtual extends Model
 {
-    use HasFactory;
+    protected $fillable = ['nome', 'descricao', 'disciplina_id'];
 
-    protected $fillable = ['nome', 'descricao', 'materia_id'];
-
-    public function materia() 
+    public function disciplina() 
     {
-        $this->belongsTo('App\Models\Materia');
+        $this->belongsTo('App\Models\Disciplina');
     }
 
     public function professores() 

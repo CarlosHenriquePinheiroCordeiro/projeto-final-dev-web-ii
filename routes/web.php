@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\CidadeController;
+use App\Http\Controllers\DisciplinaController;
 use App\Http\Controllers\EstadoController;
-use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\SalaVirtualController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::resource('/usuario'      , UsuarioController::class);
-Route::resource('/materia'      , MateriaController::class);
+Route::resource('/disciplina'   , DisciplinaController::class);
 Route::resource('/salaVirtual'  , SalaVirtualController::class);
 Route::resource('/estado'       , EstadoController::class);
 Route::resource('/cidade'       , CidadeController::class);

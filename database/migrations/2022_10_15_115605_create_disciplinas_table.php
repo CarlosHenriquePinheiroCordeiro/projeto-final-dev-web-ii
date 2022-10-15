@@ -13,12 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('sala_virtuals', function (Blueprint $table) {
+        Schema::create('disciplinas', function (Blueprint $table) {
             $table->id();
-            $table->string('nome'     , 100);
+            $table->string('nome'     , 50);
             $table->string('descricao', 500);
-            $table->unsignedBigInteger('materia_id');
-            $table->foreign('materia_id')->references('id')->on('materias');
             $table->timestamps();
         });
     }
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sala_virtuals');
+        Schema::dropIfExists('disciplinas');
     }
 };

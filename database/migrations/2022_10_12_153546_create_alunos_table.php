@@ -15,9 +15,8 @@ return new class extends Migration
     {
         Schema::create('alunos', function (Blueprint $table) {
             $table->unsignedBigInteger('pessoa_id');
-            $table->foreign('pessoa_id')->references('id')->on('pessoas')->onDelete('cascade');
-            $table->unsignedInteger('id', true);
-            $table->primary(['pessoa_id', 'id']);
+            $table->foreign('pessoa_id')->references('id')->on('pessoas');
+            $table->primary('pessoa_id');
             $table->timestamps();
         });
     }
