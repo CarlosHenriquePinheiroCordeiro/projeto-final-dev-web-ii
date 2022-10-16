@@ -17,6 +17,10 @@
             <td>{{$salaVirtual['nome']}}</td>
             <td>{{$salaVirtual['descricao']}}</td>
             <td>
+                <form action="{{route('registroAula.index')}}" method="get">
+                    <input type="hidden" id="salaVirtual" name="salaVirtual" value={{$salaVirtual['id']}}>
+                    <button type="submit">Registros de Aula</button>
+                </form>
                 <form action="{{route('salaVirtual.edit', $salaVirtual['id'])}}" method="get">
                     <button type="submit">Editar</button>
                 </form>

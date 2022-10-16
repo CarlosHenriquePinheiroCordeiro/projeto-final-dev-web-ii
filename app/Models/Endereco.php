@@ -11,6 +11,8 @@ class Endereco extends Model
 
     protected $fillable = ['pessoa_id', 'rua', 'bairro', 'numero', 'cidade_id'];
 
+    protected $primaryKey = 'pessoa_id';
+
     public function pessoa() 
     {
         return $this->belongsTo('App\Models\Pessoa');

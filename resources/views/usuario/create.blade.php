@@ -1,6 +1,6 @@
 @extends('usuario.layout')
 
-@section('titulo', 'Incluir sala virtual')
+@section('titulo', 'Incluir usuário')
 
 @section('conteudo')
     <form action="{{ route('usuario.store')}}" method="post">

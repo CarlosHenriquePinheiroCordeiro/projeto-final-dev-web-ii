@@ -176,6 +176,22 @@ class SalaVirtualController extends Controller
         $salaVirtual->descricao     = $request->descricao;
         $salaVirtual->disciplina_id = $request->disciplina_id;
         $salaVirtual->update();
+
+        SalaVirtualProfessor::where('sala_virtual_id', '=', $salaVirtual->id)->delete();
+        foreach ($request->professor_id as $pessoa_id) {
+            $SalaVirtualProfessor = new SalaVirtualProfessor();
+            $SalaVirtualProfessor->pessoa_id = $pessoa_id;
+            $SalaVirtualProfessor->sala_virtual_id = $salaVirtual->id;
+            $SalaVirtualProfessor->save();
+        }
+
+        SalaVirtualAluno::where('sala_virtual_id', '=', $salaVirtual->id)->delete();
+        foreach ($request->aluno_id as $pessoa_id) {
+            $SalaVirtualAluno = new SalaVirtualAluno();
+            $SalaVirtualAluno->pessoa_id = $pessoa_id;
+            $SalaVirtualAluno->sala_virtual_id = $salaVirtual->id;
+            $SalaVirtualAluno->save();
+        }
         return redirect()->route('salaVirtual.index');
     }
 

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cidade;
 use App\Models\Endereco;
+use App\Models\Pessoa;
 use Illuminate\Http\Request;
 
 class EnderecoController extends Controller
@@ -14,7 +16,15 @@ class EnderecoController extends Controller
      */
     public function index()
     {
-        //
+        $dados = array();
+        if (request('find') != null)
+        {
+            $busca = request('find');
+            $dados = Endereco::where('rua', 'like', "$busca%")->get();
+        }
+        else
+            $dados = Endereco::all();
+        return view('endereco.index', compact('dados'));
     }
 
     /**
@@ -24,7 +34,8 @@ class EnderecoController extends Controller
      */
     public function create()
     {
-        //
+        $dados = ['insert' => true, 'cidades' => Cidade::all(), 'pessoas' => Pessoa::all()];
+        return view('endereco.create', compact('dados'));
     }
 
     /**
@@ -35,7 +46,14 @@ class EnderecoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $Endereco = new Endereco();
+        $Endereco->pessoa_id    = $request->pessoa_id;
+        $Endereco->rua          = $request->rua;
+        $Endereco->bairro       = $request->bairro;
+        $Endereco->numero       = $request->numero;
+        $Endereco->cidade_id    = $request->cidade_id;
+        $Endereco->save();
+        return redirect()->route('endereco.index');
     }
 
     /**
@@ -46,7 +64,8 @@ class EnderecoController extends Controller
      */
     public function show(Endereco $endereco)
     {
-        //
+        $dados = ['endereco' => $endereco, 'visualizar' => true, 'cidades' => Cidade::all(), 'pessoas' => Pessoa::all()];
+        return view('endereco.show', compact('dados'));
     }
 
     /**
@@ -57,7 +76,8 @@ class EnderecoController extends Controller
      */
     public function edit(Endereco $endereco)
     {
-        //
+        $dados = ['endereco' => $endereco, 'insert' => true, 'cidades' => Cidade::all(), 'pessoas' => Pessoa::all()];
+        return view('endereco.edit', compact('dados'));
     }
 
     /**
@@ -69,7 +89,13 @@ class EnderecoController extends Controller
      */
     public function update(Request $request, Endereco $endereco)
     {
-        //
+        $endereco->pessoa_id    = $request->pessoa_id;
+        $endereco->rua          = $request->rua;
+        $endereco->bairro       = $request->bairro;
+        $endereco->numero       = $request->numero;
+        $endereco->cidade_id    = $request->cidade_id;
+        $endereco->update();
+        return redirect()->route('endereco.index');
     }
 
     /**
@@ -80,6 +106,7 @@ class EnderecoController extends Controller
      */
     public function destroy(Endereco $endereco)
     {
-        //
+        Endereco::destroy($endereco->pessoa_id);
+        return redirect()->route('endereco.index');
     }
 }

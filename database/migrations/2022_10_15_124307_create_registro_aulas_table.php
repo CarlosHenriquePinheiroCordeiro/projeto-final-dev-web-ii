@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('qtd_aula');
             $table->unsignedBigInteger('sala_virtual_id');
             $table->foreign('sala_virtual_id')->references('id')->on('sala_virtuals');
-            $table->unsignedBigInteger('pessoa_id');
+            $table->unsignedBigInteger('pessoa_id')->nullable();
             $table->foreign('pessoa_id')->references('pessoa_id')->on('sala_virtual_professors');
             $table->timestamps();
         });

@@ -1,6 +1,6 @@
 @extends('usuario.layout')
 
-@section('titulo', 'Listar salas virtuais')
+@section('titulo', 'Listar usuario')
 
 @section('conteudo')
     <h1>Usuários</h1>
