@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class SalaVirtual extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['nome', 'descricao', 'disciplina_id'];
 
     public function disciplina() 

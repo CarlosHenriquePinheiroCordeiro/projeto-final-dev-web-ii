@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AmazonController;
 use App\Http\Controllers\CidadeController;
 use App\Http\Controllers\DisciplinaController;
 use App\Http\Controllers\EnderecoController;
@@ -27,6 +28,7 @@ Route::resource('/registroAula' , RegistroAulaController::class);
 Route::resource('/estado'       , EstadoController::class);
 Route::resource('/cidade'       , CidadeController::class);
 Route::resource('/endereco'     , EnderecoController::class);
+Route::resource('/amazon'       , AmazonController::class);
 
 Route::get('/', function () {
     return view('welcome');
