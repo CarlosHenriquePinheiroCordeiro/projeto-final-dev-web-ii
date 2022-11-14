@@ -19,6 +19,14 @@ class DatabaseSeeder extends Seeder
             CidadeSeeder::class,
             UsuarioSeeder::class,
             PessoaSeeder::class,
+            EnderecoSeeder::class,
+            AlunoSeeder::class,
+            ProfessorSeeder::class,
+            DisciplinaSeeder::class,
+            SalaVirtualSeeder::class,
+            SalaVirtualAlunoSeeder::class,
+            SalaVirtualProfessorSeeder::class,
+            RegistroAulaSeeder::class
         ]);
     }
 }

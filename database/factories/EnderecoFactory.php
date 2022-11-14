@@ -19,7 +19,7 @@ class EnderecoFactory extends Factory
     public function definition()
     {
         $pessoasLivres = DB::table('pessoas')
-        ->whereRaw(' NOT EXISTS (SELECT 1 FROM enderecos WHERE enderecos.pessoa_id = pessoas.id and pessoas.id > 1)')->pluck('id');
+        ->whereRaw(' NOT EXISTS (SELECT enderecos.pessoa_id FROM enderecos WHERE enderecos.pessoa_id = pessoas.id and pessoas.id > 1)')->pluck('id');
         $cidades = Cidade::all()->pluck('id');
         return [
             'pessoa_id' => $pessoasLivres[rand(0, count($pessoasLivres)-1)],
