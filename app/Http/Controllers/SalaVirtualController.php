@@ -24,10 +24,10 @@ class SalaVirtualController extends Controller
         if (request('find') != null)
         {
             $busca = request('find');
-            $dados = SalaVirtual::where('nome', 'like', "$busca%")->get();
+            $dados = SalaVirtual::where('nome', 'like', "$busca%")->orderBy('nome')->paginate(5);
         }
         else
-            $dados = SalaVirtual::all();
+            $dados = SalaVirtual::paginate(5);
         return view('salaVirtual.index', compact('dados'));
     }
 

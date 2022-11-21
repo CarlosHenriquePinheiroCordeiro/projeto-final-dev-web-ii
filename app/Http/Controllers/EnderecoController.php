@@ -20,10 +20,10 @@ class EnderecoController extends Controller
         if (request('find') != null)
         {
             $busca = request('find');
-            $dados = Endereco::where('rua', 'like', "$busca%")->get();
+            $dados = Endereco::where('rua', 'like', "$busca%")->orderBy('rua')->paginate(5);
         }
         else
-            $dados = Endereco::all();
+            $dados = Endereco::paginate(5);
         return view('endereco.index', compact('dados'));
     }
 

@@ -18,10 +18,10 @@ class DisciplinaController extends Controller
         if (request('find') != null)
         {
             $busca = request('find');
-            $dados = Disciplina::where('nome', 'like', "$busca%")->get();
+            $dados = Disciplina::where('nome', 'like', "$busca%")->orderBy('nome')->paginate(5);
         }
         else
-            $dados = Disciplina::all();
+            $dados = Disciplina::paginate(5);
         return view('disciplina.index', compact('dados'));
     }
 

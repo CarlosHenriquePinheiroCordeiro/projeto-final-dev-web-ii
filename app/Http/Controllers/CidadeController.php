@@ -19,10 +19,10 @@ class CidadeController extends Controller
         if (request('find') != null)
         {
             $busca = request('find');
-            $dados = Cidade::where('nome', 'like', "$busca%")->get();
+            $dados = Cidade::where('nome', 'like', "$busca%")->paginate(5);
         }
         else
-            $dados = Cidade::all();
+            $dados = Cidade::paginate(5);
         return view('cidade.index', compact('dados'));
     }
 

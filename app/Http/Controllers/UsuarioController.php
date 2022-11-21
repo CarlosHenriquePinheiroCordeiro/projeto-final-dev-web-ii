@@ -25,10 +25,10 @@ class UsuarioController extends Controller
         if (request('find') != null)
         {
             $busca = request('find');
-            $dados = Pessoa::where('nome', 'like', "$busca%")->get();
+            $dados = Pessoa::where('nome', 'like', "$busca%")->orderBy('nome')->paginate(5);
         }
         else
-            $dados = Pessoa::all();
+            $dados = Pessoa::paginate(5);
         return view('usuario.index', compact('dados'));
     }
 

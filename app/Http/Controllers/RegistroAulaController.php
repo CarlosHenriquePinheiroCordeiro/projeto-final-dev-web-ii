@@ -22,10 +22,10 @@ class RegistroAulaController extends Controller
         if (request('salaVirtual') != null)
         {
             $busca = request('salaVirtual');
-            $dados = RegistroAula::where('sala_virtual_id', '=', request('salaVirtual'))->get();
+            $dados = RegistroAula::where('sala_virtual_id', '=', request('salaVirtual'))->paginate(5);
         }
         else
-            $dados = RegistroAula::all();
+            $dados = RegistroAula::paginate(5);
         return view('registroAula.index', compact('dados'));
     }
 

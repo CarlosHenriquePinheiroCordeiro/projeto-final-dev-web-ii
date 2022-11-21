@@ -7,9 +7,9 @@
     <form action="{{route('cidade.index')}}" method="get">
         <label for="find">Nome</label>
         <input type="text" id="find" name="find">
-        <button type="submit">Consultar</button>
+        <button type="submit" class="btn btn-secondary">Consultar</button>
     </form>
-    <table border="1">
+    <table border="1" class="table table-stripped">
         <th>ID</th><th>Nome</th><th>Ação</th>
         @foreach ($dados as $cidade)
         <tr>
@@ -31,4 +31,5 @@
         </tr>
         @endforeach
     </table>
+    {{$dados->links()}}
 @endsection

@@ -7,9 +7,9 @@
     <form action="{{route('endereco.index')}}" method="get">
         <label for="find">Rua</label>
         <input type="text" id="find" name="find">
-        <button type="submit">Consultar</button>
+        <button type="submit" class="btn btn-secondary">Consultar</button>
     </form>
-    <table border="1">
+    <table border="1" class="table table-stripped">
         <th>Pessoa</th><th>Rua</th><th>Bairro</th><th>Número</th><th>Ação</th>
         @foreach ($dados as $endereco)
         <tr>
@@ -33,4 +33,5 @@
         </tr>
         @endforeach
     </table>
+    {{$dados->links()}}
 @endsection
