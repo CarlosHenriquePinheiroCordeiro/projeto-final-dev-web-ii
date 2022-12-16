@@ -21,7 +21,7 @@ return new class extends Migration
             $table->char('rg', 12)->nullable();
             $table->timestamps();
             $table->unsignedBigInteger('usuario_id');
-            $table->foreign('usuario_id')->references('id')->on('usuarios');
+            $table->foreign('usuario_id')->references('id')->on('users');
         });
     }
 

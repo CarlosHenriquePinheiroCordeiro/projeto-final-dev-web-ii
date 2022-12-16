@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class SalaVirtualAluno extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['sala_virtual_id', 'pessoa_id', 'ativo'];
 }

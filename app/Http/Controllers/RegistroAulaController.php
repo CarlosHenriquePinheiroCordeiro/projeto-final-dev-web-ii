@@ -8,6 +8,7 @@ use App\Models\RegistroAula;
 use App\Models\SalaVirtual;
 use App\Models\SalaVirtualProfessor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RegistroAulaController extends Controller
 {
@@ -23,6 +24,9 @@ class RegistroAulaController extends Controller
         {
             $busca = request('salaVirtual');
             $dados = RegistroAula::where('sala_virtual_id', '=', request('salaVirtual'))->paginate(5);
+            if (request('find') != null && request('salaVirtual') != '') {
+                $dados = RegistroAula::where('sala_virtual_id', '=', request('salaVirtual'))->where('descricao', '=', request('find'))->paginate(5);
+            }
         }
         else
             $dados = RegistroAula::paginate(5);
@@ -59,7 +63,7 @@ class RegistroAulaController extends Controller
         $RegistroAula->sala_virtual_id  = $request->sala_virtual_id;
         $RegistroAula->pessoa_id        = $request->pessoa_id;
         $RegistroAula->save();
-        return redirect()->route('registroAula.index', ['salaVirtual' => $request->sala_virtual_id]);
+        return redirect()->route('registroAulaAluno.create', ['salaVirtual' => $RegistroAula->sala_virtual_id, 'registroAula' => $RegistroAula->id, 'qtdAula' => $RegistroAula->qtd_aula]);
     }
 
     /**
@@ -82,11 +86,7 @@ class RegistroAulaController extends Controller
      * Retora os professores da sala virtual
      */
     protected function getProfessoresSala($salaVirtual) {
-        $professores = [];
-        foreach (SalaVirtualProfessor::where('sala_virtual_id', '=', $salaVirtual)->get() as $salaProfessor) {
-            $professores[$salaProfessor->pessoa_id] = Pessoa::find($salaProfessor->pessoa_id)->get()[0]->nome;
-        }
-        return $professores;
+        return DB::table('pessoas')->join('sala_virtual_professors', 'sala_virtual_professors.pessoa_id', '=', 'pessoas.id')->select(['id', 'nome'])->whereRaw('sala_virtual_id = '.$salaVirtual)->pluck('.nome', 'id');
     }
 
     /**
@@ -99,7 +99,6 @@ class RegistroAulaController extends Controller
     {
         $dados = [
             'registroAula'  => $registroAula,
-            'insert'        => true,
             'professores'   => $this->getProfessoresSala($registroAula->sala_virtual_id)
         ];
         return view('registroAula.edit', compact('dados'));
@@ -120,8 +119,24 @@ class RegistroAulaController extends Controller
         $registroAula->qtd_aula         = $request->qtd_aula;
         $registroAula->sala_virtual_id  = $request->sala_virtual_id;
         $registroAula->pessoa_id        = $request->pessoa_id;
+        
+        $aulas          = RegistroAula::where('sala_virtual_id', '=', $request->sala_virtual_id)->pluck('qtd_aula')[0];
+        $qtdAula        = 0;
+        $qtdAulaInicial = 0;
         $registroAula->update();
-        return redirect()->route('registroAula.index', ['salaVirtual' => $request->sala_virtual_id]);
+        if ($request->qtd_aula > $aulas) {
+            $qtdAulaInicial = $aulas;
+            $qtdAula        = $request->qtd_aula;
+            return redirect()->route('registroAulaAluno.edit', ['registroAula' => $registroAula->id, 'registroAulaAluno' => $registroAula->id,'salaVirtual' => $request->sala_virtual_id, 'qtd_aula_inicial' => $qtdAulaInicial, 'qtd_aula' => $qtdAula]);
+        }
+        else if ($request->qtd_aula < $aulas) {
+            $qtdAulaInicial = $request->qtd_aula;
+            $qtdAula        = $aulas;
+            return redirect()->route('registroAulaAluno.edit', ['registroAula' => $registroAula->id, 'registroAulaAluno' => $registroAula->id, 'salaVirtual' => $request->sala_virtual_id, 'qtd_aula_inicial' => $qtdAulaInicial, 'qtd_aula' => $qtdAula]);
+        }
+        else {
+            return redirect()->route('registroAula.index', ['salaVirtual' => $request->sala_virtual_id]);
+        }
     }
 
     /**
@@ -135,4 +150,6 @@ class RegistroAulaController extends Controller
         RegistroAula::destroy($registroAula->id);
         return redirect()->route('registroAula.index', ['salaVirtual' => $registroAula->sala_virtual_id]);
     }
+
+
 }

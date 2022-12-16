@@ -7,8 +7,15 @@
     <form action="{{route('registroAula.index')}}" method="get">
         <label for="find">Descrição</label>
         <input type="text" id="find" name="find">
+        <input type="hidden" id="salaVirtual" name="salaVirtual" value={{request('salaVirtual')}}>
         <button type="submit" class="btn btn-secondary">Consultar</button>
     </form>
+    <br>
+    <form action="{{route('registroAula.create')}}" method="get">
+        <input type="hidden" id="salaVirtual" name="salaVirtual" value={{request('salaVirtual')}}>
+        <button type="submit" class="btn btn-primary">Incluir</button>
+    </form>
+    <br>
     <table border="1" class="table table-stripped">
         <th>ID</th><th>Descrição</th><th>Data</th><th>Aulas</th><th>Ação</th>
         @foreach ($dados as $registroAula)

@@ -6,8 +6,8 @@
 <label for="id">ID</label>
 <input type="number" name="id" id="id" @if (isset($dados['visualizar']) || isset($dados['insert'])) {{'readonly'}} @endif value=@if(isset($dados['usuario'])){{$dados['usuario']->id}} @endif >
 <br>
-<label for="usuario">Usuário</label>
-<input required name="usuario" id="usuario" @if (isset($dados['visualizar'])) {{'readonly'}} @endif value='@if(isset($dados['usuario'])){{$dados['usuario']->usuario}}@endif'  >
+<label for="email">Email</label>
+<input type="mail" required name="email" id="email" @if (isset($dados['visualizar'])) {{'readonly'}} @endif value='@if(isset($dados['usuario'])){{$dados['usuario']->usuario}}@endif'  >
 <br>
 <label for="senha">Senha</label>
 <input required name="senha" id="senha" @if (isset($dados['visualizar'])) {{'readonly'}} @endif value='@if(isset($dados['usuario'])){{$dados['usuario']->senha}}@endif'  >

@@ -13,7 +13,7 @@ class Pessoa extends Model
 
     public function usuario() 
     {
-        return $this->belongsTo('App\Models\Usuario');
+        return $this->belongsTo('App\Models\User');
     }
 
     public function aluno() 

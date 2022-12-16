@@ -5,6 +5,7 @@ use App\Http\Controllers\CidadeController;
 use App\Http\Controllers\DisciplinaController;
 use App\Http\Controllers\EnderecoController;
 use App\Http\Controllers\EstadoController;
+use App\Http\Controllers\RegistroAulaAlunoController;
 use App\Http\Controllers\RegistroAulaController;
 use App\Http\Controllers\SalaVirtualController;
 use App\Http\Controllers\UsuarioController;
@@ -21,15 +22,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::resource('/usuario'      , UsuarioController::class);
-Route::resource('/disciplina'   , DisciplinaController::class);
-Route::resource('/salaVirtual'  , SalaVirtualController::class);
-Route::resource('/registroAula' , RegistroAulaController::class);
-Route::resource('/estado'       , EstadoController::class);
-Route::resource('/cidade'       , CidadeController::class);
-Route::resource('/endereco'     , EnderecoController::class);
-Route::resource('/amazon'       , AmazonController::class);
+Route::resource('/usuario'          , UsuarioController::class);
+Route::resource('/disciplina'       , DisciplinaController::class);
+Route::resource('/salaVirtual'      , SalaVirtualController::class);
+Route::resource('/registroAula'     , RegistroAulaController::class);
+Route::resource('/registroAulaAluno', RegistroAulaAlunoController::class);
+Route::resource('/estado'           , EstadoController::class);
+Route::resource('/cidade'           , CidadeController::class);
+Route::resource('/endereco'         , EnderecoController::class);
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
+});
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified'
+])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 });

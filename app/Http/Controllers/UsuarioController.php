@@ -6,8 +6,10 @@ use App\Models\Aluno;
 use App\Models\Pessoa;
 use App\Models\Professor;
 use App\Models\TipoUsuario;
+use App\Models\User;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
@@ -51,11 +53,11 @@ class UsuarioController extends Controller
      */
     public function store(Request $request)
     {
-        $Usuario = new Usuario();
-        $Usuario->usuario           = $request->usuario;
-        $Usuario->senha             = $request->senha;
-        $Usuario->ativo             = 1;
-        $Usuario->termo             = 1;
+        $Usuario = new User();
+        $Usuario->name              = $request->nome;
+        $Usuario->email             = $request->email;
+        $Usuario->password          = Hash::make($request->senha);
+        $Usuario->terms             = 1;
         $Usuario->tipo_usuario_id   = $request->tipo_usuario_id;
         $Usuario->save();
 
@@ -85,7 +87,7 @@ class UsuarioController extends Controller
      * @param  \App\Models\Usuario  $usuario
      * @return \Illuminate\Http\Response
      */
-    public function show(Usuario $usuario)
+    public function show(User $usuario)
     {
         $dados = [
             'usuario'       => $usuario,
@@ -99,10 +101,10 @@ class UsuarioController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Usuario  $usuario
+     * @param  \App\Models\User  $usuario
      * @return \Illuminate\Http\Response
      */
-    public function edit(Usuario $usuario)
+    public function edit(User $usuario)
     {
         $dados = [
             'usuario'       => $usuario,
@@ -118,10 +120,10 @@ class UsuarioController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Usuario  $usuario
+     * @param  \App\Models\User  $usuario
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Usuario $usuario)
+    public function update(Request $request, User $usuario)
     {
         $usuario->id                = $request->id;
         $usuario->usuario           = $request->usuario;
@@ -142,14 +144,14 @@ class UsuarioController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Usuario  $usuario
+     * @param  \App\Models\User  $usuario
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Usuario $usuario)
+    public function destroy(User $usuario)
     {
         $Pessoa = Pessoa::where('usuario_id', '=', $usuario->id)->get()[0];
         Pessoa::destroy($Pessoa->id);
-        Usuario::destroy($usuario->id);
+        User::destroy($usuario->id);
         return redirect()->route('usuario.index');
     }
 }

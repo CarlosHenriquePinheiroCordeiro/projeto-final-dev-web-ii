@@ -10,6 +10,7 @@ use App\Models\SalaVirtual;
 use App\Models\SalaVirtualAluno;
 use App\Models\SalaVirtualProfessor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SalaVirtualController extends Controller
 {
@@ -58,7 +59,7 @@ class SalaVirtualController extends Controller
         return $professores;
     }
 
-     /**
+    /**
      * Retorna os professores para a lista de NxN para a sala virtual
      */
     protected function getAlunos() {
@@ -86,15 +87,17 @@ class SalaVirtualController extends Controller
 
         foreach ($request->professor_id as $pessoa_id) {
             $SalaVirtualProfessor = new SalaVirtualProfessor();
-            $SalaVirtualProfessor->pessoa_id = $pessoa_id;
-            $SalaVirtualProfessor->sala_virtual_id = $SalaVirtual->id;
+            $SalaVirtualProfessor->pessoa_id        = $pessoa_id;
+            $SalaVirtualProfessor->sala_virtual_id  = $SalaVirtual->id;
+            $SalaVirtualProfessor->ativo            = 1;
             $SalaVirtualProfessor->save();
         }
 
         foreach ($request->aluno_id as $pessoa_id) {
             $SalaVirtualAluno = new SalaVirtualAluno();
-            $SalaVirtualAluno->pessoa_id = $pessoa_id;
+            $SalaVirtualAluno->pessoa_id       = $pessoa_id;
             $SalaVirtualAluno->sala_virtual_id = $SalaVirtual->id;
+            $SalaVirtualAluno->ativo           = 1;
             $SalaVirtualAluno->save();
         }
         return redirect()->route('salaVirtual.index');
@@ -125,7 +128,7 @@ class SalaVirtualController extends Controller
      */
     protected function getProfessoresSala($salaVirtual) {
         $professores = [];
-        foreach (SalaVirtualProfessor::where('sala_virtual_id', '=', $salaVirtual)->get() as $salaProfessor) {
+        foreach (DB::table('sala_virtual_professors')->select('pessoa_id')->whereRaw('sala_virtual_id = '.$salaVirtual.' and ativo = '.'1')->get() as $salaProfessor) {
             $professores[] = $salaProfessor->pessoa_id;
         }
         return $professores;
@@ -136,7 +139,7 @@ class SalaVirtualController extends Controller
      */
     protected function getAlunosSala($salaVirtual) {
         $alunos = [];
-        foreach (SalaVirtualAluno::where('sala_virtual_id', '=', $salaVirtual)->get() as $salaAluno) {
+        foreach (DB::table('sala_virtual_alunos')->select('pessoa_id')->whereRaw('sala_virtual_id = '.$salaVirtual.' and ativo = '.'1')->get() as $salaAluno) {
             $alunos[] = $salaAluno->pessoa_id;
         }
         return $alunos;
@@ -177,20 +180,32 @@ class SalaVirtualController extends Controller
         $salaVirtual->disciplina_id = $request->disciplina_id;
         $salaVirtual->update();
 
-        SalaVirtualProfessor::where('sala_virtual_id', '=', $salaVirtual->id)->delete();
-        foreach ($request->professor_id as $pessoa_id) {
+        DB::update('update sala_virtual_professors set ativo = ? where sala_virtual_id = ?', ['0', $salaVirtual->id]);
+        DB::update('update sala_virtual_alunos     set ativo = ? where sala_virtual_id = ?', ['0', $salaVirtual->id]);
+        foreach ($request->professor_id ? $request->professor_id : [] as $pessoa_id) {
             $SalaVirtualProfessor = new SalaVirtualProfessor();
             $SalaVirtualProfessor->pessoa_id = $pessoa_id;
             $SalaVirtualProfessor->sala_virtual_id = $salaVirtual->id;
-            $SalaVirtualProfessor->save();
+            if (SalaVirtualProfessor::where('sala_virtual_id', '=', $salaVirtual->id)->where('pessoa_id', '=', $pessoa_id)->first() == null) {
+                $SalaVirtualProfessor->ativo = 1;
+                $SalaVirtualProfessor->save();
+            }
+            else {
+                DB::update('update sala_virtual_professors set ativo = ? where sala_virtual_id = ? and pessoa_id = ?', ['1', $salaVirtual->id, $pessoa_id]);
+            }
         }
 
-        SalaVirtualAluno::where('sala_virtual_id', '=', $salaVirtual->id)->delete();
-        foreach ($request->aluno_id as $pessoa_id) {
+        foreach ($request->aluno_id ? $request->aluno_id : [] as $pessoa_id) {
             $SalaVirtualAluno = new SalaVirtualAluno();
             $SalaVirtualAluno->pessoa_id = $pessoa_id;
             $SalaVirtualAluno->sala_virtual_id = $salaVirtual->id;
-            $SalaVirtualAluno->save();
+            if (SalaVirtualAluno::where('sala_virtual_id', '=', $salaVirtual->id)->where('pessoa_id', '=', $pessoa_id)->first() == null) {
+                $SalaVirtualAluno->ativo = 1;
+                $SalaVirtualAluno->save();
+            }
+            else {
+                DB::update('update sala_virtual_alunos set ativo = ? where sala_virtual_id = ? and pessoa_id = ?', ['1', $salaVirtual->id, $pessoa_id]);
+            }
         }
         return redirect()->route('salaVirtual.index');
     }

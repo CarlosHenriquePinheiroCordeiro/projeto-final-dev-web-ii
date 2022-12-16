@@ -9,6 +9,11 @@
         <input type="text" id="find" name="find">
         <button type="submit" class="btn btn-secondary">Consultar</button>
     </form>
+    <br>
+    <form action="{{route('disciplina.create')}}" method="get">
+        <button type="submit" class="btn btn-primary">Incluir</button>
+    </form>
+    <br>
     <table border="1" class="table table-stripped">
         <th>ID</th><th>Nome</th><th>Descrição</th><th>Ação</th>
         @foreach ($dados as $disciplina)

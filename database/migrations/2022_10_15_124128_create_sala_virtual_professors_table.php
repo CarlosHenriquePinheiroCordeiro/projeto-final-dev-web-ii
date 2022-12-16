@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('sala_virtual_id');
             $table->foreign('sala_virtual_id')->references('id')->on('sala_virtuals');
             $table->primary(['pessoa_id', 'sala_virtual_id']);
+            $table->boolean('ativo');
             $table->timestamps();
         });
     }

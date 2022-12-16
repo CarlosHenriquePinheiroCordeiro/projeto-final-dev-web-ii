@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('registro_aula_id');
             $table->foreign('registro_aula_id')->references('id')->on('registro_aulas');
             $table->primary(['pessoa_id', 'registro_aula_id']);
+            $table->integer('presenca');
             $table->timestamps();
         });
     }

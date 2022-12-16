@@ -30,7 +30,8 @@ class SalaVirtualAlunoFactory extends Factory
         }
         return [
             'sala_virtual_id'   => $sala_virtual_id,
-            'pessoa_id'         => $pessoa_id
+            'pessoa_id'         => $pessoa_id,
+            'situacao'          => rand(0, 1)
         ];
     }
 }

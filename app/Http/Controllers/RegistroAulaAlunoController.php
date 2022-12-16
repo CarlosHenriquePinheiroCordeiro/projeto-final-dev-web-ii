@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\RegistroAulaAluno;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RegistroAulaAlunoController extends Controller
 {
@@ -24,7 +25,23 @@ class RegistroAulaAlunoController extends Controller
      */
     public function create()
     {
-        //
+        $dados = [
+            'insert'            => true,
+            'alunos'            => $this->getAlunosSala(request('salaVirtual')),
+            'registroAula'      => request('registroAula'),
+            'salaVirtual'       => request('salaVirtual'),
+            'qtd_aula'          => request('qtdAula'),
+            'qtd_aula_inicial'  => 0,
+        ];
+        return view('registroAulaAluno.create', compact('dados'));
+    }
+
+    /**
+     * Retorna os alunos vinculados à sala virtual para listar a presença
+     */
+    protected function getAlunosSala($salaVirtual) {
+        return DB::table('sala_virtual_alunos')->join('pessoas', 'sala_virtual_alunos.pessoa_id', '=', 'pessoas.id')
+        ->selectRaw('pessoa_id, nome')->where('sala_virtual_id', '=', $salaVirtual)->pluck('pessoas.nome', 'pessoa_id');
     }
 
     /**
@@ -35,7 +52,14 @@ class RegistroAulaAlunoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        foreach ($request->pessoa_id as $chaveAluno => $presencas) {
+            $registroAulaAluno = new RegistroAulaAluno();
+            $registroAulaAluno->registro_aula_id = $request->registro_aula_id;
+            $registroAulaAluno->pessoa_id        = $chaveAluno;
+            $registroAulaAluno->presenca         = $presencas;
+            $registroAulaAluno->save();
+        }
+        return redirect()->route('registroAula.index', ['salaVirtual' => request('sala_virtual_id')]);
     }
 
     /**
@@ -46,7 +70,15 @@ class RegistroAulaAlunoController extends Controller
      */
     public function show(RegistroAulaAluno $registroAulaAluno)
     {
-        //
+        $dados = [
+            'visualizar'        => true,
+            'alunos'            => $this->getAlunosSala(request('salaVirtual')),
+            'registroAula'      => request('registroAula'),
+            'registroAulaAluno' => $this->getRegistrosPresenca(request('registroAula')),
+            'salaVirtual'       => request('salaVirtual'),
+            'qtd_aula'          => request('qtdAula')
+        ];
+        return view('registroAulaAluno.show', compact('dados'));
     }
 
     /**
@@ -57,7 +89,22 @@ class RegistroAulaAlunoController extends Controller
      */
     public function edit(RegistroAulaAluno $registroAulaAluno)
     {
-        //
+        $dados = [
+            'alunos'            => $this->getAlunosSala(request('salaVirtual')),
+            'registroAula'      => request('registroAula'),
+            'registroAulaAluno' => $this->getRegistrosPresenca(request('registroAula')),
+            'salaVirtual'       => request('salaVirtual'),
+            'qtd_aula'          => request('qtdAula'),
+            'qtd_aula_inicial'  => request('qtdAulaInicial'),
+        ];
+        return view('registroAulaAluno.edit', compact('dados'));
+    }
+
+    /**
+     * Retorna os registros de presença relacionados ao registro de aula
+     */
+    public function getRegistrosPresenca($registroAula) {
+        return DB::table('registro_aula_alunos')->selectRaw('*')->where('registro_aula_id', '=', $registroAula)->pluck('presenca', 'pessoa_id');
     }
 
     /**

@@ -22,6 +22,3 @@
     @endforeach
 </select>
 <br>
-@if(!isset($dados['visualizar']))
-    <button type="submit">Enviar</button>
-@endif
