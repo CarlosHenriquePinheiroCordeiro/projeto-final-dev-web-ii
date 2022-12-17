@@ -31,5 +31,5 @@
 @endforeach
 <hr>
 @if(!isset($dados['visualizar']))
-    <button type="submit">Enviar</button>
+    <button class="btn btn-outline-primary" type="submit">Enviar</button>
 @endif

@@ -11,5 +11,5 @@
 <input required name="sigla" id="sigla" @if (isset($dados['visualizar'])) {{'readonly'}} @endif value='@if(isset($dados['estado'])){{$dados['estado']->sigla}}@endif' >
 <br>
 @if(!isset($dados['visualizar']))
-    <button type="submit">Enviar</button>
+    <button class="btn btn-outline-primary" type="submit">Enviar</button>
 @endif

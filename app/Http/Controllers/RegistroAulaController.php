@@ -134,9 +134,7 @@ class RegistroAulaController extends Controller
             $qtdAula        = $aulas;
             return redirect()->route('registroAulaAluno.edit', ['registroAula' => $registroAula->id, 'registroAulaAluno' => $registroAula->id, 'salaVirtual' => $request->sala_virtual_id, 'qtd_aula_inicial' => $qtdAulaInicial, 'qtd_aula' => $qtdAula]);
         }
-        else {
-            return redirect()->route('registroAula.index', ['salaVirtual' => $request->sala_virtual_id]);
-        }
+        return redirect()->route('registroAula.index', ['salaVirtual' => $request->sala_virtual_id]);
     }
 
     /**

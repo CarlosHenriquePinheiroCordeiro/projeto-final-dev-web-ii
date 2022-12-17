@@ -19,7 +19,7 @@ class PessoaFactory extends Factory
      */
     public function definition()
     {
-        $usuariosLivres = DB::table('usuarios')->whereRaw(' NOT EXISTS (SELECT 1 FROM pessoas WHERE pessoas.usuario_id = usuarios.id)')->pluck('id');
+        $usuariosLivres = DB::table('users')->whereRaw(' NOT EXISTS (SELECT 1 FROM pessoas WHERE pessoas.usuario_id = users.id)')->pluck('id');
         $usuarioId      = $usuariosLivres[rand(0, count($usuariosLivres)-1)];
         $faker = FakerFactory::create('pt_BR');
         $cpf = str_replace('.', '', $faker->cpf);

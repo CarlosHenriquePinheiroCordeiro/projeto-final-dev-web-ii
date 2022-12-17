@@ -32,7 +32,7 @@ Route::resource('/cidade'           , CidadeController::class);
 Route::resource('/endereco'         , EnderecoController::class);
 
 Route::get('/', function () {
-    return view('home');
+    return view('auth.login');
 });
 Route::middleware([
     'auth:sanctum',

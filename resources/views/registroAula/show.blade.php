@@ -8,6 +8,6 @@
         <input type="hidden" name="registroAula" id="registroAula" value={{$dados['registroAula']->id}}>
         <input type="hidden" name="salaVirtual" id="salaVirtual" value={{$dados['registroAula']->sala_virtual_id}}>
         <input type="hidden" name="qtdAula" id="qtdAula" value={{$dados['registroAula']->qtd_aula}}>
-        <button type="submit">Visualizar presenças</button>
+        <button class="btn btn-outline-primary" type="submit">Visualizar presenças</button>
     </form>
 @endsection

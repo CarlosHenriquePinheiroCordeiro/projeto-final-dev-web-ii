@@ -28,4 +28,12 @@
             </li>
         </ul>
     </div>
+    <div class="d-flex align-items-center">
+        <form @submit.prevent="logout()">
+            @csrf
+            <button as="button" type="submit">
+                Sair
+            </button>
+        </form>
+    </div>
 </nav>

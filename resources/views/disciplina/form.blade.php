@@ -11,5 +11,5 @@
 <input required name="descricao" id="descricao" @if (isset($dados['visualizar'])) {{'readonly'}} @endif value='@if(isset($dados['disciplina'])){{$dados['disciplina']->descricao}}@endif' >
 <br>
 @if(!isset($dados['visualizar']))
-    <button type="submit">Enviar</button>
+    <button class="btn btn-outline-primary" type="submit">Enviar</button>
 @endif

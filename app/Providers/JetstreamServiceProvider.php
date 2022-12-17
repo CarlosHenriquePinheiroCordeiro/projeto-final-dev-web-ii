@@ -3,9 +3,14 @@
 namespace App\Providers;
 
 use App\Actions\Jetstream\DeleteUser;
+use App\Models\User;
+use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Fortify;
 use Laravel\Jetstream\Jetstream;
+use Laravel\Fortify\Http\Requests\LoginRequest;
+use Livewire\Request as LivewireRequest;
 
 class JetstreamServiceProvider extends ServiceProvider
 {
@@ -29,6 +34,16 @@ class JetstreamServiceProvider extends ServiceProvider
         $this->configurePermissions();
 
         Jetstream::deleteUsersUsing(DeleteUser::class);
+        Fortify::authenticateUsing(function (LoginRequest $request) {
+            $user = User::where('email', $request->email)->first();
+    
+            if ($user && Hash::check($request->password, $user->password)) {
+                $_SESSION['id']              = $user->id;
+                $_SESSION['name']            = $user->name;
+                $_SESSION['tipo_usuario_id'] = $user->tipo_usuario_id;
+                return $user;
+            }
+        });
     }
 
     /**
