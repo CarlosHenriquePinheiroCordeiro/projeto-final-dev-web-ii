@@ -21,10 +21,12 @@
                     <button type="submit" class="btn btn-outline-secondary">Consultar</button>
                 </form>
                 <br>
+                @if (session()->all()['tipo_usuario_id'] != 3)
                 <form action="{{route('registroAula.create')}}" method="get">
                     <input type="hidden" id="salaVirtual" name="salaVirtual" value={{request('salaVirtual')}}>
                     <button type="submit" class="btn btn-outline-success">Incluir</button>
                 </form>
+                @endif
                 <br>
                 <table border="1" class="table table-stripped">
                     <th>ID</th><th>Descrição</th><th>Data</th><th>Aulas</th><th>Ação</th>
@@ -35,6 +37,7 @@
                         <td>{{$registroAula['data']}}</td>
                         <td>{{$registroAula['qtd_aula']}}</td>
                         <td>
+                            @if (session()->all()['tipo_usuario_id'] != 3)
                             <form action="{{route('registroAula.edit', $registroAula['id'])}}" method="get">
                                 <button class="btn btn-outline-warning" type="submit">Editar</button>
                             </form>
@@ -43,6 +46,7 @@
                                 @csrf
                                 <button class="btn btn-outline-danger" type="submit">Excluir</button>
                             </form>
+                            @endif
                             <form action="{{route('registroAula.show', $registroAula['id'])}}" method="get">
                                 <button class="btn btn-outline-primary" type="submit">Visualizar</button>
                             </form>

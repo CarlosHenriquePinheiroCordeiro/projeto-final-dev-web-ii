@@ -17,6 +17,23 @@ class UsuarioController extends Controller
     const TIPO_USUARIO_ALUNO     = 3;
 
     /**
+     * Valida o privilégio de acesso à página
+     */
+    private function validaPrivilegio($rotinaValido) {
+        if (!$this->permiteAcao()) {
+            return redirect()->route('login');
+        }
+        return $rotinaValido;
+    }
+
+    /**
+     * Retorna se a ação é permitida pelo usuário atual
+     */
+    private function permiteAcao() {
+        return session()->all()['tipo_usuario_id'] == 1;
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -31,7 +48,7 @@ class UsuarioController extends Controller
         }
         else
             $dados = Pessoa::paginate(5);
-        return view('usuario.index', compact('dados'));
+        return $this->validaPrivilegio(view('usuario.index', compact('dados')));
     }
 
     /**
@@ -42,7 +59,7 @@ class UsuarioController extends Controller
     public function create()
     {
         $dados = ['insert' => true, 'tipo_usuarios' => TipoUsuario::all()];
-        return view('usuario.create', compact('dados'));
+        return $this->validaPrivilegio(view('usuario.create', compact('dados')));
     }
 
     /**
@@ -53,30 +70,32 @@ class UsuarioController extends Controller
      */
     public function store(Request $request)
     {
-        $Usuario = new User();
-        $Usuario->name              = $request->nome;
-        $Usuario->email             = $request->email;
-        $Usuario->password          = Hash::make($request->senha);
-        $Usuario->terms             = 1;
-        $Usuario->tipo_usuario_id   = $request->tipo_usuario_id;
-        $Usuario->save();
+        if ($this->permiteAcao()) {
+            $Usuario = new User();
+            $Usuario->name              = $request->nome;
+            $Usuario->email             = $request->email;
+            $Usuario->password          = Hash::make($request->senha);
+            $Usuario->terms             = 1;
+            $Usuario->tipo_usuario_id   = $request->tipo_usuario_id;
+            $Usuario->save();
 
-        $Pessoa = new Pessoa();
-        $Pessoa->nome               = $request->nome;
-        $Pessoa->data_nascimento    = $request->data_nascimento;
-        $Pessoa->cpf                = $request->cpf;
-        $Pessoa->rg                 = $request->rg;
-        $Pessoa->usuario_id         = $Usuario->id;
-        $Pessoa->save();
+            $Pessoa = new Pessoa();
+            $Pessoa->nome               = $request->nome;
+            $Pessoa->data_nascimento    = $request->data_nascimento;
+            $Pessoa->cpf                = $request->cpf;
+            $Pessoa->rg                 = $request->rg;
+            $Pessoa->usuario_id         = $Usuario->id;
+            $Pessoa->save();
 
-        if ($Usuario->tipo_usuario_id == self::TIPO_USUARIO_PROFESSOR) {
-            $Professor = new Professor();
-            $Professor->pessoa_id = $Pessoa->id;
-            $Professor->save();
-        } else if ($Usuario->tipo_usuario_id == self::TIPO_USUARIO_ALUNO) {
-            $Aluno = new Aluno();
-            $Aluno->pessoa_id = $Pessoa->id;
-            $Aluno->save();
+            if ($Usuario->tipo_usuario_id == self::TIPO_USUARIO_PROFESSOR) {
+                $Professor = new Professor();
+                $Professor->pessoa_id = $Pessoa->id;
+                $Professor->save();
+            } else if ($Usuario->tipo_usuario_id == self::TIPO_USUARIO_ALUNO) {
+                $Aluno = new Aluno();
+                $Aluno->pessoa_id = $Pessoa->id;
+                $Aluno->save();
+            }
         }
         return redirect()->route('usuario.index');
     }
@@ -95,7 +114,7 @@ class UsuarioController extends Controller
             'pessoa'        => Pessoa::where('usuario_id', '=', $usuario->id)->get()[0],
             'tipo_usuarios' => TipoUsuario::all()
         ];
-        return view('usuario.show', compact('dados'));
+        return $this->validaPrivilegio(view('usuario.show', compact('dados')));
     }
 
     /**
@@ -113,7 +132,7 @@ class UsuarioController extends Controller
             'pessoa'        => Pessoa::where('usuario_id', '=', $usuario->id)->get()[0],
             'tipo_usuarios' => TipoUsuario::all()
         ];
-        return view('usuario.edit', compact('dados'));
+        return $this->validaPrivilegio(view('usuario.edit', compact('dados')));
     }
 
     /**
@@ -125,19 +144,21 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, User $usuario)
     {
-        $usuario->id                = $request->id;
-        $usuario->usuario           = $request->usuario;
-        $usuario->senha             = $request->senha;
-        $usuario->tipo_usuario_id   = $request->tipo_usuario_id;
-        $usuario->update();
+        if ($this->permiteAcao()) {
+            $usuario->id                = $request->id;
+            $usuario->usuario           = $request->usuario;
+            $usuario->senha             = $request->senha;
+            $usuario->tipo_usuario_id   = $request->tipo_usuario_id;
+            $usuario->update();
 
-        $Pessoa = Pessoa::where('usuario_id', '=', $usuario->id)->get()[0];
-        $Pessoa->nome               = $request->nome;
-        $Pessoa->data_nascimento    = $request->data_nascimento;
-        $Pessoa->cpf                = $request->cpf;
-        $Pessoa->rg                 = $request->rg;
-        $Pessoa->usuario_id         = $usuario->id;
-        $Pessoa->update();
+            $Pessoa = Pessoa::where('usuario_id', '=', $usuario->id)->get()[0];
+            $Pessoa->nome               = $request->nome;
+            $Pessoa->data_nascimento    = $request->data_nascimento;
+            $Pessoa->cpf                = $request->cpf;
+            $Pessoa->rg                 = $request->rg;
+            $Pessoa->usuario_id         = $usuario->id;
+            $Pessoa->update();
+        }
         return redirect()->route('usuario.index');
     }
 
@@ -149,9 +170,11 @@ class UsuarioController extends Controller
      */
     public function destroy(User $usuario)
     {
-        $Pessoa = Pessoa::where('usuario_id', '=', $usuario->id)->get()[0];
-        Pessoa::destroy($Pessoa->id);
-        User::destroy($usuario->id);
+        if ($this->permiteAcao()) {
+            $Pessoa = Pessoa::where('usuario_id', '=', $usuario->id)->get()[0];
+            Pessoa::destroy($Pessoa->id);
+            User::destroy($usuario->id);
+        }
         return redirect()->route('usuario.index');
     }
 }

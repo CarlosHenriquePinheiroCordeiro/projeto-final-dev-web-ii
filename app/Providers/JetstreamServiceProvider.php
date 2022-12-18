@@ -38,9 +38,12 @@ class JetstreamServiceProvider extends ServiceProvider
             $user = User::where('email', $request->email)->first();
     
             if ($user && Hash::check($request->password, $user->password)) {
-                $_SESSION['id']              = $user->id;
-                $_SESSION['name']            = $user->name;
-                $_SESSION['tipo_usuario_id'] = $user->tipo_usuario_id;
+                $tipoUsuario = [
+                    1 => 'admin',
+                    2 => 'Professor',
+                    3 => 'Aluno'
+                ];
+                session(['nome' => $user->name, 'tipo_usuario_id' => $user->tipo_usuario_id, 'tipoUsuario' => $tipoUsuario[$user->tipo_usuario_id]]);
                 return $user;
             }
         });

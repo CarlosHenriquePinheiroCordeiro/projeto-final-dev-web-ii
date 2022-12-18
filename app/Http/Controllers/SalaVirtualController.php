@@ -14,6 +14,24 @@ use Illuminate\Support\Facades\DB;
 
 class SalaVirtualController extends Controller
 {
+
+    /**
+     * Valida o privilégio de acesso à página
+     */
+    private function validaPrivilegio($rotinaValido) {
+        if (!$this->permiteAcao()) {
+            return redirect()->route('login');
+        }
+        return $rotinaValido;
+    }
+
+    /**
+     * Retorna se a ação é permitida pelo usuário atual
+     */
+    private function permiteAcao() {
+        return session()->all()['tipo_usuario_id'] != 3;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -45,7 +63,8 @@ class SalaVirtualController extends Controller
             'professores' => $this->getProfessores(),
             'alunos'      => $this->getAlunos()
         ];
-        return view('salaVirtual.create', compact('dados'));
+        
+        return $this->validaPrivilegio(view('salaVirtual.create', compact('dados')));
     }
 
     /**
@@ -78,27 +97,29 @@ class SalaVirtualController extends Controller
      */
     public function store(Request $request)
     {
-        $SalaVirtual = new SalaVirtual();
-        $SalaVirtual->id            = $request->id;
-        $SalaVirtual->nome          = $request->nome;
-        $SalaVirtual->descricao     = $request->descricao;
-        $SalaVirtual->disciplina_id = $request->disciplina_id;
-        $SalaVirtual->save();
+        if ($this->permiteAcao()) {
+            $SalaVirtual = new SalaVirtual();
+            $SalaVirtual->id            = $request->id;
+            $SalaVirtual->nome          = $request->nome;
+            $SalaVirtual->descricao     = $request->descricao;
+            $SalaVirtual->disciplina_id = $request->disciplina_id;
+            $SalaVirtual->save();
 
-        foreach ($request->professor_id as $pessoa_id) {
-            $SalaVirtualProfessor = new SalaVirtualProfessor();
-            $SalaVirtualProfessor->pessoa_id        = $pessoa_id;
-            $SalaVirtualProfessor->sala_virtual_id  = $SalaVirtual->id;
-            $SalaVirtualProfessor->ativo            = 1;
-            $SalaVirtualProfessor->save();
-        }
+            foreach ($request->professor_id as $pessoa_id) {
+                $SalaVirtualProfessor = new SalaVirtualProfessor();
+                $SalaVirtualProfessor->pessoa_id        = $pessoa_id;
+                $SalaVirtualProfessor->sala_virtual_id  = $SalaVirtual->id;
+                $SalaVirtualProfessor->ativo            = 1;
+                $SalaVirtualProfessor->save();
+            }
 
-        foreach ($request->aluno_id as $pessoa_id) {
-            $SalaVirtualAluno = new SalaVirtualAluno();
-            $SalaVirtualAluno->pessoa_id       = $pessoa_id;
-            $SalaVirtualAluno->sala_virtual_id = $SalaVirtual->id;
-            $SalaVirtualAluno->ativo           = 1;
-            $SalaVirtualAluno->save();
+            foreach ($request->aluno_id as $pessoa_id) {
+                $SalaVirtualAluno = new SalaVirtualAluno();
+                $SalaVirtualAluno->pessoa_id       = $pessoa_id;
+                $SalaVirtualAluno->sala_virtual_id = $SalaVirtual->id;
+                $SalaVirtualAluno->ativo           = 1;
+                $SalaVirtualAluno->save();
+            }
         }
         return redirect()->route('salaVirtual.index');
     }
@@ -162,7 +183,7 @@ class SalaVirtualController extends Controller
             'professoresSala' => $this->getProfessoresSala($salaVirtual->id),
             'alunosSala' => $this->getAlunosSala($salaVirtual->id)
         ];
-        return view('salaVirtual.edit', compact('dados'));
+        return $this->validaPrivilegio(view('salaVirtual.edit', compact('dados')));
     }
 
     /**
@@ -174,37 +195,39 @@ class SalaVirtualController extends Controller
      */
     public function update(Request $request, SalaVirtual $salaVirtual)
     {
-        $salaVirtual->id            = $request->id;
-        $salaVirtual->nome          = $request->nome;
-        $salaVirtual->descricao     = $request->descricao;
-        $salaVirtual->disciplina_id = $request->disciplina_id;
-        $salaVirtual->update();
+        if ($this->permiteAcao()) {
+            $salaVirtual->id            = $request->id;
+            $salaVirtual->nome          = $request->nome;
+            $salaVirtual->descricao     = $request->descricao;
+            $salaVirtual->disciplina_id = $request->disciplina_id;
+            $salaVirtual->update();
 
-        DB::update('update sala_virtual_professors set ativo = ? where sala_virtual_id = ?', ['0', $salaVirtual->id]);
-        DB::update('update sala_virtual_alunos     set ativo = ? where sala_virtual_id = ?', ['0', $salaVirtual->id]);
-        foreach ($request->professor_id ? $request->professor_id : [] as $pessoa_id) {
-            $SalaVirtualProfessor = new SalaVirtualProfessor();
-            $SalaVirtualProfessor->pessoa_id = $pessoa_id;
-            $SalaVirtualProfessor->sala_virtual_id = $salaVirtual->id;
-            if (SalaVirtualProfessor::where('sala_virtual_id', '=', $salaVirtual->id)->where('pessoa_id', '=', $pessoa_id)->first() == null) {
-                $SalaVirtualProfessor->ativo = 1;
-                $SalaVirtualProfessor->save();
+            DB::update('update sala_virtual_professors set ativo = ? where sala_virtual_id = ?', ['0', $salaVirtual->id]);
+            DB::update('update sala_virtual_alunos     set ativo = ? where sala_virtual_id = ?', ['0', $salaVirtual->id]);
+            foreach ($request->professor_id ? $request->professor_id : [] as $pessoa_id) {
+                $SalaVirtualProfessor = new SalaVirtualProfessor();
+                $SalaVirtualProfessor->pessoa_id = $pessoa_id;
+                $SalaVirtualProfessor->sala_virtual_id = $salaVirtual->id;
+                if (SalaVirtualProfessor::where('sala_virtual_id', '=', $salaVirtual->id)->where('pessoa_id', '=', $pessoa_id)->first() == null) {
+                    $SalaVirtualProfessor->ativo = 1;
+                    $SalaVirtualProfessor->save();
+                }
+                else {
+                    DB::update('update sala_virtual_professors set ativo = ? where sala_virtual_id = ? and pessoa_id = ?', ['1', $salaVirtual->id, $pessoa_id]);
+                }
             }
-            else {
-                DB::update('update sala_virtual_professors set ativo = ? where sala_virtual_id = ? and pessoa_id = ?', ['1', $salaVirtual->id, $pessoa_id]);
-            }
-        }
 
-        foreach ($request->aluno_id ? $request->aluno_id : [] as $pessoa_id) {
-            $SalaVirtualAluno = new SalaVirtualAluno();
-            $SalaVirtualAluno->pessoa_id = $pessoa_id;
-            $SalaVirtualAluno->sala_virtual_id = $salaVirtual->id;
-            if (SalaVirtualAluno::where('sala_virtual_id', '=', $salaVirtual->id)->where('pessoa_id', '=', $pessoa_id)->first() == null) {
-                $SalaVirtualAluno->ativo = 1;
-                $SalaVirtualAluno->save();
-            }
-            else {
-                DB::update('update sala_virtual_alunos set ativo = ? where sala_virtual_id = ? and pessoa_id = ?', ['1', $salaVirtual->id, $pessoa_id]);
+            foreach ($request->aluno_id ? $request->aluno_id : [] as $pessoa_id) {
+                $SalaVirtualAluno = new SalaVirtualAluno();
+                $SalaVirtualAluno->pessoa_id = $pessoa_id;
+                $SalaVirtualAluno->sala_virtual_id = $salaVirtual->id;
+                if (SalaVirtualAluno::where('sala_virtual_id', '=', $salaVirtual->id)->where('pessoa_id', '=', $pessoa_id)->first() == null) {
+                    $SalaVirtualAluno->ativo = 1;
+                    $SalaVirtualAluno->save();
+                }
+                else {
+                    DB::update('update sala_virtual_alunos set ativo = ? where sala_virtual_id = ? and pessoa_id = ?', ['1', $salaVirtual->id, $pessoa_id]);
+                }
             }
         }
         return redirect()->route('salaVirtual.index');
@@ -218,7 +241,8 @@ class SalaVirtualController extends Controller
      */
     public function destroy(SalaVirtual $salaVirtual)
     {
-        SalaVirtual::destroy($salaVirtual->id);
+        if ($this->permiteAcao())
+            SalaVirtual::destroy($salaVirtual->id);
         return redirect()->route('salaVirtual.index');
     }
 }

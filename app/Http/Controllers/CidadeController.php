@@ -8,6 +8,24 @@ use Illuminate\Http\Request;
 
 class CidadeController extends Controller
 {
+
+    /**
+     * Valida o privilégio de acesso à página
+     */
+    private function validaPrivilegio($rotinaValido) {
+        if (!$this->permiteAcao()) {
+            return redirect()->route('login');
+        }
+        return $rotinaValido;
+    }
+
+    /**
+     * Retorna se a ação é permitida pelo usuário atual
+     */
+    private function permiteAcao() {
+        return session()->all()['tipo_usuario_id'] == 1;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -23,7 +41,7 @@ class CidadeController extends Controller
         }
         else
             $dados = Cidade::paginate(5);
-        return view('cidade.index', compact('dados'));
+        return $this->validaPrivilegio(view('cidade.index', compact('dados')));
     }
 
     /**
@@ -34,7 +52,7 @@ class CidadeController extends Controller
     public function create()
     {
         $dados = ['insert' => true, 'estados' => Estado::all()];
-        return view('cidade.create', compact('dados'));
+        return $this->validaPrivilegio(view('cidade.create', compact('dados')));
     }
 
     /**
@@ -45,11 +63,13 @@ class CidadeController extends Controller
      */
     public function store(Request $request)
     {
-        $Cidade = new Cidade();
-        $Cidade->id         = $request->id;
-        $Cidade->nome       = $request->nome;
-        $Cidade->estado_id  = $request->estado_id;
-        $Cidade->save();
+        if ($this->permiteAcao()) {
+            $Cidade = new Cidade();
+            $Cidade->id         = $request->id;
+            $Cidade->nome       = $request->nome;
+            $Cidade->estado_id  = $request->estado_id;
+            $Cidade->save();
+        }
         return redirect()->route('cidade.index');
     }
 
@@ -62,7 +82,7 @@ class CidadeController extends Controller
     public function show(Cidade $cidade)
     {
         $dados = ['cidade' => $cidade, 'visualizar' => true, 'estados' => Estado::all()];
-        return view('cidade.show', compact('dados'));
+        return $this->validaPrivilegio(view('cidade.show', compact('dados')));
     }
 
     /**
@@ -74,7 +94,7 @@ class CidadeController extends Controller
     public function edit(Cidade $cidade)
     {
         $dados = ['cidade' => $cidade, 'insert' => true, 'estados' => Estado::all()];
-        return view('cidade.edit', compact('dados'));
+        return $this->validaPrivilegio(view('cidade.edit', compact('dados')));
     }
 
     /**
@@ -86,10 +106,12 @@ class CidadeController extends Controller
      */
     public function update(Request $request, Cidade $cidade)
     {
-        $cidade->id         = $request->id;
-        $cidade->nome       = $request->nome;
-        $cidade->estado_id  = $request->estado_id;
-        $cidade->update();
+        if ($this->permiteAcao()) {
+            $cidade->id         = $request->id;
+            $cidade->nome       = $request->nome;
+            $cidade->estado_id  = $request->estado_id;
+            $cidade->update();
+        }
         return redirect()->route('cidade.index');
     }
 
@@ -101,7 +123,9 @@ class CidadeController extends Controller
      */
     public function destroy(Cidade $cidade)
     {
-        Cidade::destroy($cidade->id);
+        if ($this->permiteAcao()) {
+            Cidade::destroy($cidade->id);
+        }
         return redirect()->route('cidade.index');
     }
 }

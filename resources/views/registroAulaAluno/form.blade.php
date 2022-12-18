@@ -11,7 +11,7 @@
         <option @if (isset($dados['registroAulaAluno']) && $dados['registroAulaAluno'][$aluno_pessoa_id] == $i+1) {{'selected'}} @endif value={{$i+1}}>{{$i+1}} Presença(s)</option>
     @endfor
 </select>
-@if (isset($dados['registroAulaAluno'])) {{'(antes '.$dados['registroAulaAluno'][$aluno_pessoa_id].' presenças)'}} @elseif (isset($dados['registroAulaAluno']) && isset($dados['aulasAntes'])) {{'antes '.$dados['registroAulaAluno'][$aluno_pessoa_id].' presença(s) com '.$dados['aulasAntes']}} @endif
+@if (isset($dados['registroAulaAluno']) && isset($dados['aulasAntes'])) {{'antes '.$dados['registroAulaAluno'][$aluno_pessoa_id].' presença(s) com '.$dados['aulasAntes'].' aulas'}} @elseif (isset($dados['registroAulaAluno'])) {{'(antes '.$dados['registroAulaAluno'][$aluno_pessoa_id].' presenças)'}}  @endif
 <br>
 @endforeach
 <br>

@@ -7,6 +7,24 @@ use Illuminate\Http\Request;
 
 class EstadoController extends Controller
 {
+
+    /**
+     * Valida o privilégio de acesso à página
+     */
+    private function validaPrivilegio($rotinaValido) {
+        if (!$this->permiteAcao()) {
+            return redirect()->route('login');
+        }
+        return $rotinaValido;
+    }
+
+    /**
+     * Retorna se a ação é permitida pelo usuário atual
+     */
+    private function permiteAcao() {
+        return session()->all()['tipo_usuario_id'] == 1;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -22,7 +40,7 @@ class EstadoController extends Controller
         }
         else
             $dados = Estado::paginate(5);
-        return view('estado.index', compact('dados'));
+        return $this->validaPrivilegio(view('estado.index', compact('dados')));
     }
 
     /**
@@ -33,7 +51,7 @@ class EstadoController extends Controller
     public function create()
     {
         $dados = ['insert' => true];
-        return view('estado.create', compact('dados'));
+        return $this->validaPrivilegio(view('estado.create', compact('dados')));
     }
 
     /**
@@ -44,11 +62,13 @@ class EstadoController extends Controller
      */
     public function store(Request $request)
     {
-        $Estado = new Estado();
-        $Estado->id     = $request->id;
-        $Estado->nome   = $request->nome;
-        $Estado->sigla  = $request->sigla;
-        $Estado->save();
+        if ($this->permiteAcao()) {
+            $Estado = new Estado();
+            $Estado->id     = $request->id;
+            $Estado->nome   = $request->nome;
+            $Estado->sigla  = $request->sigla;
+            $Estado->save();
+        }
         return redirect()->route('estado.index');
     }
 
@@ -61,7 +81,7 @@ class EstadoController extends Controller
     public function show(Estado $estado)
     {
         $dados = ['estado' => $estado, 'visualizar' => true];
-        return view('estado.show', compact('dados'));
+        return $this->validaPrivilegio(view('estado.show', compact('dados')));
     }
 
     /**
@@ -73,7 +93,7 @@ class EstadoController extends Controller
     public function edit(Estado $estado)
     {
         $dados = ['estado' => $estado, 'insert' => true];
-        return view('estado.edit', compact('dados'));
+        return $this->validaPrivilegio(view('estado.edit', compact('dados')));
     }
 
     /**
@@ -85,10 +105,12 @@ class EstadoController extends Controller
      */
     public function update(Request $request, Estado $estado)
     {
-        $estado->id     = $request->id;
-        $estado->nome   = $request->nome;
-        $estado->sigla  = $request->sigla;
-        $estado->update();
+        if ($this->permiteAcao()) {
+            $estado->id     = $request->id;
+            $estado->nome   = $request->nome;
+            $estado->sigla  = $request->sigla;
+            $estado->update();
+        }
         return redirect()->route('estado.index');
     }
 
@@ -100,7 +122,8 @@ class EstadoController extends Controller
      */
     public function destroy(Estado $estado)
     {
-        Estado::destroy($estado->id);
+        if ($this->permiteAcao())
+            Estado::destroy($estado->id);
         return redirect()->route('estado.index');
     }
 }

@@ -9,6 +9,24 @@ use Illuminate\Http\Request;
 
 class EnderecoController extends Controller
 {
+
+    /**
+     * Valida o privilégio de acesso à página
+     */
+    private function validaPrivilegio($rotinaValido) {
+        if (!$this->permiteAcao()) {
+            return redirect()->route('login');
+        }
+        return $rotinaValido;
+    }
+
+    /**
+     * Retorna se a ação é permitida pelo usuário atual
+     */
+    private function permiteAcao() {
+        return session()->all()['tipo_usuario_id'] == 1;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -24,7 +42,7 @@ class EnderecoController extends Controller
         }
         else
             $dados = Endereco::paginate(5);
-        return view('endereco.index', compact('dados'));
+        return $this->validaPrivilegio(view('endereco.index', compact('dados')));
     }
 
     /**
@@ -35,7 +53,7 @@ class EnderecoController extends Controller
     public function create()
     {
         $dados = ['insert' => true, 'cidades' => Cidade::all(), 'pessoas' => Pessoa::all()];
-        return view('endereco.create', compact('dados'));
+        return $this->validaPrivilegio(view('endereco.create', compact('dados')));
     }
 
     /**
@@ -46,13 +64,15 @@ class EnderecoController extends Controller
      */
     public function store(Request $request)
     {
-        $Endereco = new Endereco();
-        $Endereco->pessoa_id    = $request->pessoa_id;
-        $Endereco->rua          = $request->rua;
-        $Endereco->bairro       = $request->bairro;
-        $Endereco->numero       = $request->numero;
-        $Endereco->cidade_id    = $request->cidade_id;
-        $Endereco->save();
+        if ($this->permiteAcao()) {
+            $Endereco = new Endereco();
+            $Endereco->pessoa_id    = $request->pessoa_id;
+            $Endereco->rua          = $request->rua;
+            $Endereco->bairro       = $request->bairro;
+            $Endereco->numero       = $request->numero;
+            $Endereco->cidade_id    = $request->cidade_id;
+            $Endereco->save();
+        }
         return redirect()->route('endereco.index');
     }
 
@@ -65,7 +85,7 @@ class EnderecoController extends Controller
     public function show(Endereco $endereco)
     {
         $dados = ['endereco' => $endereco, 'visualizar' => true, 'cidades' => Cidade::all(), 'pessoas' => Pessoa::all()];
-        return view('endereco.show', compact('dados'));
+        return $this->validaPrivilegio(view('endereco.show', compact('dados')));
     }
 
     /**
@@ -77,7 +97,7 @@ class EnderecoController extends Controller
     public function edit(Endereco $endereco)
     {
         $dados = ['endereco' => $endereco, 'insert' => true, 'cidades' => Cidade::all(), 'pessoas' => Pessoa::all()];
-        return view('endereco.edit', compact('dados'));
+        return $this->validaPrivilegio(view('endereco.edit', compact('dados')));
     }
 
     /**
@@ -89,12 +109,14 @@ class EnderecoController extends Controller
      */
     public function update(Request $request, Endereco $endereco)
     {
-        $endereco->pessoa_id    = $request->pessoa_id;
-        $endereco->rua          = $request->rua;
-        $endereco->bairro       = $request->bairro;
-        $endereco->numero       = $request->numero;
-        $endereco->cidade_id    = $request->cidade_id;
-        $endereco->update();
+        if ($this->permiteAcao()) {
+            $endereco->pessoa_id    = $request->pessoa_id;
+            $endereco->rua          = $request->rua;
+            $endereco->bairro       = $request->bairro;
+            $endereco->numero       = $request->numero;
+            $endereco->cidade_id    = $request->cidade_id;
+            $endereco->update();
+        }
         return redirect()->route('endereco.index');
     }
 
@@ -106,7 +128,8 @@ class EnderecoController extends Controller
      */
     public function destroy(Endereco $endereco)
     {
-        Endereco::destroy($endereco->pessoa_id);
+        if ($this->permiteAcao())
+            Endereco::destroy($endereco->pessoa_id);
         return redirect()->route('endereco.index');
     }
 }

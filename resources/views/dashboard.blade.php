@@ -1,5 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
+        <h1 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Bem vindo '.session()->all()['tipoUsuario'].' '.session()->all()['nome']) }}
+        </h1>
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Sistema Escolar - Registros de Aulas') }}
         </h2>

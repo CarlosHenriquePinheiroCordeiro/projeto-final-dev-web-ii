@@ -9,6 +9,24 @@ use Illuminate\Support\Facades\DB;
 
 class RegistroAulaAlunoController extends Controller
 {
+
+    /**
+     * Valida o privilégio de acesso à página
+     */
+    private function validaPrivilegio($rotinaValido) {
+        if (!$this->permiteAcao()) {
+            return redirect()->route('login');
+        }
+        return $rotinaValido;
+    }
+
+    /**
+     * Retorna se a ação é permitida pelo usuário atual
+     */
+    private function permiteAcao() {
+        return session()->all()['tipo_usuario_id'] != 3;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -34,7 +52,7 @@ class RegistroAulaAlunoController extends Controller
             'qtd_aula'          => request('qtdAula'),
             'qtd_aula_inicial'  => 0,
         ];
-        return view('registroAulaAluno.create', compact('dados'));
+        return $this->validaPrivilegio(view('registroAulaAluno.create', compact('dados')));
     }
 
     /**
@@ -53,12 +71,14 @@ class RegistroAulaAlunoController extends Controller
      */
     public function store(Request $request)
     {
-        foreach ($request->pessoa_id as $chaveAluno => $presencas) {
-            $registroAulaAluno = new RegistroAulaAluno();
-            $registroAulaAluno->registro_aula_id = $request->registro_aula_id;
-            $registroAulaAluno->pessoa_id        = $chaveAluno;
-            $registroAulaAluno->presenca         = $presencas;
-            $registroAulaAluno->save();
+        if ($this->permiteAcao()) {
+            foreach ($request->pessoa_id as $chaveAluno => $presencas) {
+                $registroAulaAluno = new RegistroAulaAluno();
+                $registroAulaAluno->registro_aula_id = $request->registro_aula_id;
+                $registroAulaAluno->pessoa_id        = $chaveAluno;
+                $registroAulaAluno->presenca         = $presencas;
+                $registroAulaAluno->save();
+            }
         }
         return redirect()->route('registroAula.index', ['salaVirtual' => request('sala_virtual_id')]);
     }
@@ -77,9 +97,10 @@ class RegistroAulaAlunoController extends Controller
             'registroAula'      => request('registroAula'),
             'registroAulaAluno' => $this->getRegistrosPresenca(request('registroAula')),
             'salaVirtual'       => request('salaVirtual'),
-            'qtd_aula'          => request('qtdAula')
+            'qtd_aula'          => request('qtd_aula'),
+            'qtd_aula_inicial'  => 0,
         ];
-        return view('registroAulaAluno.show', compact('dados'));
+        return $this->validaPrivilegio(view('registroAulaAluno.show', compact('dados')));
     }
 
     /**
@@ -99,7 +120,7 @@ class RegistroAulaAlunoController extends Controller
             'qtd_aula_inicial'  => 0,
             'aulasAntes'        => request('aulasAntes'),
         ];
-        return view('registroAulaAluno.edit', compact('dados'));
+        return $this->validaPrivilegio(view('registroAulaAluno.edit', compact('dados')));
     }
 
     /**
@@ -118,8 +139,10 @@ class RegistroAulaAlunoController extends Controller
      */
     public function update(Request $request, RegistroAulaAluno $registroAulaAluno)
     {
-        foreach (request('pessoa_id') as $pessoa_id => $presencas) {
-            DB::update('update registro_aula_alunos set presenca = ? where registro_aula_id = ? and pessoa_id = ?', [$presencas, request('registro_aula_id'), $pessoa_id]);
+        if ($this->permiteAcao()) {
+            foreach (request('pessoa_id') as $pessoa_id => $presencas) {
+                DB::update('update registro_aula_alunos set presenca = ? where registro_aula_id = ? and pessoa_id = ?', [$presencas, request('registro_aula_id'), $pessoa_id]);
+            }
         }
         return redirect()->route('registroAula.index', ['salaVirtual' => request('sala_virtual_id')]);
     }

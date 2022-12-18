@@ -1,6 +1,6 @@
 @extends('registroAulaAluno.layout')
 
-@section('titulo', 'Editar presença')
+@section('titulo', 'Editar presenças para '.$dados['qtd_aula'].' aulas')
 
 @section('conteudo')
     <form action="{{route('registroAulaAluno.update', $dados['registroAula'])}}" method="post">

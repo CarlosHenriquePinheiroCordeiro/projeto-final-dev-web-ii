@@ -7,6 +7,24 @@ use Illuminate\Http\Request;
 
 class DisciplinaController extends Controller
 {
+
+    /**
+     * Valida o privilégio de acesso à página
+     */
+    private function validaPrivilegio($rotinaValido) {
+        if (!$this->permiteAcao()) {
+            return redirect()->route('login');
+        }
+        return $rotinaValido;
+    }
+
+    /**
+     * Retorna se a ação é permitida pelo usuário atual
+     */
+    private function permiteAcao() {
+        return session()->all()['tipo_usuario_id'] != 3;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -33,7 +51,7 @@ class DisciplinaController extends Controller
     public function create()
     {
         $dados = ['insert' => true];
-        return view('disciplina.create', compact('dados'));
+        return $this->validaPrivilegio(view('disciplina.create', compact('dados')));
     }
 
     /**
@@ -44,11 +62,13 @@ class DisciplinaController extends Controller
      */
     public function store(Request $request)
     {
+        if ($this->permiteAcao()) {
         $Disciplina = new Disciplina();
-        $Disciplina->id         = $request->id;
-        $Disciplina->nome       = $request->nome;
-        $Disciplina->descricao  = $request->descricao;
-        $Disciplina->save();
+            $Disciplina->id         = $request->id;
+            $Disciplina->nome       = $request->nome;
+            $Disciplina->descricao  = $request->descricao;
+            $Disciplina->save();
+        }
         return redirect()->route('disciplina.index');
     }
 
@@ -61,7 +81,7 @@ class DisciplinaController extends Controller
     public function show(Disciplina $disciplina)
     {
         $dados = ['disciplina' => $disciplina, 'visualizar' => true];
-        return view('disciplina.show', compact('dados'));
+        $this->validaPrivilegio(view('disciplina.show', compact('dados')));
     }
 
     /**
@@ -73,7 +93,7 @@ class DisciplinaController extends Controller
     public function edit(Disciplina $disciplina)
     {
         $dados = ['disciplina' => $disciplina, 'insert' => true];
-        return view('disciplina.edit', compact('dados'));
+        $this->validaPrivilegio(view('disciplina.edit', compact('dados')));
     }
 
     /**
@@ -85,10 +105,12 @@ class DisciplinaController extends Controller
      */
     public function update(Request $request, Disciplina $disciplina)
     {
-        $disciplina->id         = $request->id;
-        $disciplina->nome       = $request->nome;
-        $disciplina->descricao  = $request->descricao;
-        $disciplina->update();
+        if ($this->permiteAcao()) {
+            $disciplina->id         = $request->id;
+            $disciplina->nome       = $request->nome;
+            $disciplina->descricao  = $request->descricao;
+            $disciplina->update();
+        }
         return redirect()->route('disciplina.index');
     }
 
@@ -100,7 +122,9 @@ class DisciplinaController extends Controller
      */
     public function destroy(Disciplina $disciplina)
     {
-        Disciplina::destroy($disciplina->id);
+        if ($this->permiteAcao()) {
+            Disciplina::destroy($disciplina->id);
+        }
         return redirect()->route('disciplina.index');
     }
 }

@@ -16,26 +16,34 @@
                         {{ __('Página Inicial') }}
                     </x-jet-nav-link>
                 </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-jet-nav-link href="{{ route('usuario.index') }}" :active="request()->routeIs('usuario.index')">
-                        {{ __('Usuários') }}
-                    </x-jet-nav-link>
-                </div>
+                @if (session()->all()['tipo_usuario_id'] == 1)
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                        <x-jet-nav-link href="{{ route('usuario.index') }}" :active="request()->routeIs('usuario.index')">
+                            {{ __('Usuários') }}
+                        </x-jet-nav-link>
+                    </div>
+                @endif
+                @if (session()->all()['tipo_usuario_id'] == 1)
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-jet-nav-link href="{{ route('estado.index') }}" :active="request()->routeIs('estado.index')">
                         {{ __('Estados') }}
                     </x-jet-nav-link>
                 </div>
+                @endif
+                @if (session()->all()['tipo_usuario_id'] == 1)
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-jet-nav-link href="{{ route('cidade.index') }}" :active="request()->routeIs('cidade.index')">
                         {{ __('Cidades') }}
                     </x-jet-nav-link>
                 </div>
+                @endif
+                @if (session()->all()['tipo_usuario_id'] == 1)
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-jet-nav-link href="{{ route('endereco.index') }}" :active="request()->routeIs('endereco.index')">
                         {{ __('Endereços') }}
                     </x-jet-nav-link>
                 </div>
+                @endif
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-jet-nav-link href="{{ route('disciplina.index') }}" :active="request()->routeIs('disciplina.index')">
                         {{ __('Disciplinas') }}
