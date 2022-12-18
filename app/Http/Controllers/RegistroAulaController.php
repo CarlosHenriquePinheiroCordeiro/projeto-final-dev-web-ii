@@ -121,18 +121,9 @@ class RegistroAulaController extends Controller
         $registroAula->pessoa_id        = $request->pessoa_id;
         
         $aulas          = RegistroAula::where('sala_virtual_id', '=', $request->sala_virtual_id)->pluck('qtd_aula')[0];
-        $qtdAula        = 0;
-        $qtdAulaInicial = 0;
         $registroAula->update();
-        if ($request->qtd_aula > $aulas) {
-            $qtdAulaInicial = $aulas;
-            $qtdAula        = $request->qtd_aula;
-            return redirect()->route('registroAulaAluno.edit', ['registroAula' => $registroAula->id, 'registroAulaAluno' => $registroAula->id,'salaVirtual' => $request->sala_virtual_id, 'qtd_aula_inicial' => $qtdAulaInicial, 'qtd_aula' => $qtdAula]);
-        }
-        else if ($request->qtd_aula < $aulas) {
-            $qtdAulaInicial = $request->qtd_aula;
-            $qtdAula        = $aulas;
-            return redirect()->route('registroAulaAluno.edit', ['registroAula' => $registroAula->id, 'registroAulaAluno' => $registroAula->id, 'salaVirtual' => $request->sala_virtual_id, 'qtd_aula_inicial' => $qtdAulaInicial, 'qtd_aula' => $qtdAula]);
+        if ($request->qtd_aula != $aulas) {
+            return redirect()->route('registroAulaAluno.edit', ['registroAula' => $registroAula->id, 'registroAulaAluno' => $registroAula->id,'salaVirtual' => $request->sala_virtual_id, 'qtd_aula' => $request->qtd_aula, 'aulasAntes' => $aulas]);
         }
         return redirect()->route('registroAula.index', ['salaVirtual' => $request->sala_virtual_id]);
     }
