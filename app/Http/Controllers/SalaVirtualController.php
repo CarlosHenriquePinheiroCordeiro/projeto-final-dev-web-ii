@@ -42,11 +42,24 @@ class SalaVirtualController extends Controller
         $dados = array();
         if (request('find') != null)
         {
-            $busca = request('find');
+            $busca = request('find').'%';
             $dados = SalaVirtual::where('nome', 'like', "$busca%")->orderBy('nome')->paginate(5);
+            if (session()->all()['tipo_usuario_id'] == 2) {
+                $dados = DB::table('sala_virtuals')->select(['sala_virtuals.*'])->join('sala_virtual_professors' , 'sala_virtual_professors.sala_virtual_id', '=', 'sala_virtuals.id')->join('pessoas', 'pessoas.id', '=', 'sala_virtual_professors.pessoa_id')->whereRaw('pessoas.id = '. session()->all()['pessoa_id'].' and sala_virtuals.nome like "'.$busca.'"')->orderBy('sala_virtuals.nome')->paginate(5);
+            }
+            if (session()->all()['tipo_usuario_id'] == 3) {
+                $dados = DB::table('sala_virtuals')->select(['sala_virtuals.*'])->join('sala_virtual_alunos' , 'sala_virtual_alunos.sala_virtual_id', '=', 'sala_virtuals.id')->join('pessoas', 'pessoas.id', '=', 'sala_virtual_alunos.pessoa_id')->whereRaw('pessoas.id = '. session()->all()['pessoa_id'].' and sala_virtuals.nome like "'.$busca.'"')->orderBy('sala_virtuals.nome')->paginate(5);
+            }
         }
-        else
+        else {
             $dados = SalaVirtual::paginate(5);
+            if (session()->all()['tipo_usuario_id'] == 2) {
+                $dados = DB::table('sala_virtuals')->select(['sala_virtuals.*'])->join('sala_virtual_professors' , 'sala_virtual_professors.sala_virtual_id', '=', 'sala_virtuals.id')->join('pessoas', 'pessoas.id', '=', 'sala_virtual_professors.pessoa_id')->where('pessoas.id', '=', session()->all()['pessoa_id'])->orderBy('sala_virtuals.nome')->paginate(5);
+            }
+            if (session()->all()['tipo_usuario_id'] == 3) {
+                $dados = DB::table('sala_virtuals')->select(['sala_virtuals.*'])->join('sala_virtual_alunos' , 'sala_virtual_alunos.sala_virtual_id', '=', 'sala_virtuals.id')->join('pessoas', 'pessoas.id', '=', 'sala_virtual_alunos.pessoa_id')->where('pessoas.id', '=', session()->all()['pessoa_id'])->orderBy('sala_virtuals.nome')->paginate(5);
+            }
+        }
         return view('salaVirtual.index', compact('dados'));
     }
 

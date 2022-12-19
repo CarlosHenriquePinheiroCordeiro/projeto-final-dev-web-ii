@@ -30,25 +30,25 @@
                     <th>ID</th><th>Nome</th><th>Descrição</th><th>Ação</th>
                     @foreach ($dados as $salaVirtual)
                     <tr>
-                        <td>{{$salaVirtual['id']}}</td>
-                        <td>{{$salaVirtual['nome']}}</td>
-                        <td>{{$salaVirtual['descricao']}}</td>
+                        <td>{{$salaVirtual->id}}</td>
+                        <td>{{$salaVirtual->nome}}</td>
+                        <td>{{$salaVirtual->descricao}}</td>
                         <td>
                             <form action="{{route('registroAula.index')}}" method="get">
-                                <input type="hidden" id="salaVirtual" name="salaVirtual" value={{$salaVirtual['id']}}>
+                                <input type="hidden" id="salaVirtual" name="salaVirtual" value={{$salaVirtual->id}}>
                                 <button class="btn btn-outline-info" type="submit">Registros de Aula</button>
                             </form>
                             @if (session()->all()['tipo_usuario_id'] != 3)
-                            <form action="{{route('salaVirtual.edit', $salaVirtual['id'])}}" method="get">
+                            <form action="{{route('salaVirtual.edit', $salaVirtual->id)}}" method="get">
                                 <button class="btn btn-outline-warning" type="submit">Editar</button>
                             </form>
-                            <form action="{{route('salaVirtual.destroy', $salaVirtual['id'])}}" method="post" onsubmit="return confirm('Deseja excluir este registro?')">
+                            <form action="{{route('salaVirtual.destroy', $salaVirtual->id)}}" method="post" onsubmit="return confirm('Deseja excluir este registro?')">
                                 @method("DELETE")
                                 @csrf
                                 <button class="btn btn-outline-danger" type="submit">Excluir</button>
                             </form>
                             @endif
-                            <form action="{{route('salaVirtual.show', $salaVirtual['id'])}}" method="get">
+                            <form action="{{route('salaVirtual.show', $salaVirtual->id)}}" method="get">
                                 <button class="btn btn-outline-primary" type="submit">Visualizar</button>
                             </form>
                         </td>

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Actions\Jetstream\DeleteUser;
+use App\Models\Pessoa;
 use App\Models\User;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Hash;
@@ -43,7 +44,12 @@ class JetstreamServiceProvider extends ServiceProvider
                     2 => 'Professor',
                     3 => 'Aluno'
                 ];
-                session(['nome' => $user->name, 'tipo_usuario_id' => $user->tipo_usuario_id, 'tipoUsuario' => $tipoUsuario[$user->tipo_usuario_id]]);
+                $parametros = ['nome' => $user->name, 'tipo_usuario_id' => $user->tipo_usuario_id, 'tipoUsuario' => $tipoUsuario[$user->tipo_usuario_id]];
+                if ($user->tipo_usuario_id != 1) {
+                    $pessoa_id = Pessoa::where('usuario_id', $user->id)->first()->id;
+                    $parametros['pessoa_id'] = $pessoa_id;
+                }
+                session($parametros);
                 return $user;
             }
         });
