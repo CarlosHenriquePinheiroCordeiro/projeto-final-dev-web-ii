@@ -7,10 +7,10 @@
 <input type="number" name="id" id="id" @if (isset($dados['visualizar']) || isset($dados['insert'])) {{'readonly'}} @endif value=@if(isset($dados['usuario'])){{$dados['usuario']->id}} @endif >
 <br>
 <label for="email">Email</label>
-<input type="mail" required name="email" id="email" @if (isset($dados['visualizar'])) {{'readonly'}} @endif value='@if(isset($dados['usuario'])){{$dados['usuario']->usuario}}@endif'  >
+<input type="mail" required name="email" id="email" @if (isset($dados['visualizar'])) {{'readonly'}} @endif value='@if(isset($dados['usuario'])){{$dados['usuario']->email}}@endif'  >
 <br>
 <label for="senha">Senha</label>
-<input required name="senha" id="senha" @if (isset($dados['visualizar'])) {{'readonly'}} @endif value='@if(isset($dados['usuario'])){{$dados['usuario']->senha}}@endif'  >
+<input required name="senha" id="senha" @if (isset($dados['visualizar'])) {{'readonly'}} @endif value='@if(isset($dados['usuario'])){{$dados['usuario']->password}}@endif'  >
 <br>
 <label for="tipo_usuario_id">Tipo de Usuário</label>
 <select name="tipo_usuario_id" id="tipo_usuario_id" @if (isset($dados['visualizar']) || isset($dados['immutable'])) {{'disabled'}} @endif >
